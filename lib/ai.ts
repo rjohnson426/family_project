@@ -17,7 +17,7 @@ export const AI_TOOLS: AiTool[] = [
   {
     id: "restore",
     label: "Restore old photo",
-    description: "Repairs scratches, tears, fading and damage.",
+    description: "Repairs scratches, tears and fading, and adds color.",
     model: "flux-kontext-apps/restore-image",
     input: (image) => ({ input_image: image, output_format: "jpg", safety_tolerance: 2 }),
   },
