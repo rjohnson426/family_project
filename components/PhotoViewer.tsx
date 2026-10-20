@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { imgSrc, type Photo } from "@/lib/manifest";
 
 // The editor is large and needs the browser canvas, so it loads only when opened.
+const AiPanel = dynamic(() => import("./AiPanel"), { ssr: false });
 const Editor = dynamic(() => import("./Editor"), {
   ssr: false,
   loading: () => <div className="fixed inset-0 z-50 grid place-items-center bg-black/80 text-white">Loading editor…</div>,
@@ -27,10 +28,12 @@ const button =
 
 export default function PhotoViewer({ id, photo, position, folderName, backHref, prevHref, nextHref }: Props) {
   const router = useRouter();
-  const [editing, setEditing] = useState(false);
+  // The editor opens on the original photo or on an AI result (a blob: URL).
+  const [editing, setEditing] = useState<string | null>(null);
+  const [aiOpen, setAiOpen] = useState(false);
 
   useEffect(() => {
-    if (editing) return;
+    if (editing || aiOpen) return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "ArrowLeft" && prevHref) router.push(prevHref);
       else if (e.key === "ArrowRight" && nextHref) router.push(nextHref);
@@ -38,7 +41,7 @@ export default function PhotoViewer({ id, photo, position, folderName, backHref,
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [editing, prevHref, nextHref, backHref, router]);
+  }, [editing, aiOpen, prevHref, nextHref, backHref, router]);
 
   // Warm the cache so arrowing through a folder feels instant.
   useEffect(() => {
@@ -55,7 +58,10 @@ export default function PhotoViewer({ id, photo, position, folderName, backHref,
           {photo.filename}
           {position && <span className="text-stone-500"> · {position}</span>}
         </p>
-        <button type="button" className={button} onClick={() => setEditing(true)}>
+        <button type="button" className={button} onClick={() => setAiOpen(true)}>
+          ✨ AI fix
+        </button>
+        <button type="button" className={button} onClick={() => setEditing(imgSrc(id, "full"))}>
           Edit
         </button>
         <a href={imgSrc(id, "full", true)} className="rounded-lg bg-amber-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-600">
@@ -86,7 +92,18 @@ export default function PhotoViewer({ id, photo, position, folderName, backHref,
         )}
       </div>
 
-      {editing && <Editor id={id} filename={photo.filename} onClose={() => setEditing(false)} />}
+      {aiOpen && (
+        <AiPanel
+          id={id}
+          filename={photo.filename}
+          onClose={() => setAiOpen(false)}
+          onEdit={(src) => {
+            setAiOpen(false);
+            setEditing(src);
+          }}
+        />
+      )}
+      {editing && <Editor source={editing} filename={photo.filename} onClose={() => setEditing(null)} />}
     </div>
   );
 }

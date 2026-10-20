@@ -1,18 +1,17 @@
 "use client";
 
 import FilerobotImageEditor, { TABS, TOOLS } from "react-filerobot-image-editor";
-import { imgSrc } from "@/lib/manifest";
 
 /**
  * Filerobot Image Editor (MIT, runs entirely in the browser; no account or API key).
  * Saving downloads the edited copy; nothing is uploaded back.
  */
-export default function Editor({ id, filename, onClose }: { id: string; filename: string; onClose: () => void }) {
+export default function Editor({ source, filename, onClose }: { source: string; filename: string; onClose: () => void }) {
   const base = filename.replace(/\.[^.]+$/, "");
   return (
     <div className="fixed inset-0 z-50 bg-white">
       <FilerobotImageEditor
-        source={imgSrc(id, "full")}
+        source={source}
         tabsIds={[TABS.ADJUST, TABS.FINETUNE, TABS.FILTERS, TABS.ANNOTATE, TABS.RESIZE]}
         defaultTabId={TABS.ADJUST}
         defaultToolId={TOOLS.CROP}

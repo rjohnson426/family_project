@@ -11,4 +11,6 @@ Password-protected family photo site at https://family.southport-holdings.com. I
 - **Password:** the shared `FAMILY_PASSWORD` (Rob chose it) lives in env vars only. Never put it in tracked files.
 - **Local preview:** the `family-photos` launch config serves http://localhost:3210. Port 3200 is often taken by a recipes server. Without a Blob token it reads `../family_facial_recognition/data/web_export` directly.
 - **Before pushing:** `npm run lint && npx tsc --noEmit && npm test && npm run build`.
+- **AI fix:** Replicate models in `lib/ai.ts`, with a site-wide cap of 50 a day (`lib/usage.ts`). `REPLICATE_API_TOKEN` lives in `.env.local` and the Vercel env.
+  - Each test run costs real money (cents), so keep test runs to a handful.
 - **Editor:** `react-filerobot-image-editor` is pinned to an exact 5.0 beta, which is the version that supports React 19. Check the editor still opens and saves after any upgrade.
