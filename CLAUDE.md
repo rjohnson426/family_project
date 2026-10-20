@@ -4,7 +4,8 @@ Password-protected family photo site at https://family.southport-holdings.com. I
 
 @AGENTS.md
 
-- **Repo:** `git@github.com:rjohnson426/family_project.git` (`main`; the folder is `family_photos`, the repo is `family_project`). Vercel project `family-photos`, and every push to `main` deploys.
+- **Repo:** `git@github.com:rjohnson426/family_project.git` (`main`; the folder is `family_photos`, the repo is `family_project`). Vercel project `family-photos` in the Southport team (Pro plan), and every push to `main` deploys.
+- **Hosting:** the private Blob store `family-photos` is connected to production and preview. `BLOB_READ_WRITE_TOKEN` is also in `.env.local`, so local dev and `npm run sync` use the production store. Hobby can't hold the library (1 GB storage and 2,000 uploads a month), so the team must stay on Pro.
 - **Stack:** Next.js 16 (`proxy.ts`, not middleware), React 19, Tailwind 4. Tests use the Node test runner (`tests/`).
 - **Photos aren't in this repo.** They live in a **private** Vercel Blob store. They get there by running `export-web` in family_facial_recognition, then `npm run sync` here.
   - Keep the store private and keep every image behind `/api/img`, which checks the cookie. Never switch to public blob URLs.
