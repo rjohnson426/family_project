@@ -75,3 +75,11 @@ test("search finds people by nickname, ignoring quotes and case, and ranks word 
   assert.deepEqual(searchFolders(index, "   "), []);
   assert.deepEqual(searchFolders(index, "zzz"), []);
 });
+
+test("All photos lists every photo once and works as a viewer source", async () => {
+  const { allPhotos, ALL_PATH } = await import("@/lib/manifest");
+  assert.deepEqual(allPhotos(manifest).photoIds, ["1", "2", "3"]);
+  assert.equal(findFolder(manifest, [ALL_PATH])?.name, "All photos");
+  assert.equal(folderHref(ALL_PATH), "/all");
+  assert.equal(zipEntries(manifest, allPhotos(manifest)).length, 3);
+});

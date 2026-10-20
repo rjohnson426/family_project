@@ -22,8 +22,17 @@ export function isSize(s: string): s is Size {
   return (SIZES as readonly string[]).includes(s);
 }
 
+/** Path of the "All photos" view: every photo once, no folders. Can't clash with a name. */
+export const ALL_PATH = "*";
+
+export function allPhotos(manifest: Manifest): Folder {
+  const photoIds = Object.keys(manifest.photos).sort((a, b) => Number(a) - Number(b));
+  return { name: "All photos", path: ALL_PATH, photoIds, children: [] };
+}
+
 /** Finds a folder by its path segments (already URL-decoded). */
 export function findFolder(manifest: Manifest, segments: string[]): Folder | null {
+  if (segments.length === 1 && segments[0] === ALL_PATH) return allPhotos(manifest);
   let level = manifest.folders;
   let found: Folder | null = null;
   for (let i = 0; i < segments.length; i++) {
@@ -36,6 +45,7 @@ export function findFolder(manifest: Manifest, segments: string[]): Folder | nul
 }
 
 export function folderHref(path: string): string {
+  if (path === ALL_PATH) return "/all";
   return "/f/" + path.split("/").map(encodeURIComponent).join("/");
 }
 

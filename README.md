@@ -8,6 +8,7 @@ Password-protected site for browsing and downloading the named family photos fro
 - **Tiles:** Medium or Large tile view.
 - **Full size:** click a photo; ← / → step through the folder and Esc goes back.
 - **Download:** one photo, or a whole folder as a zip. A family zip has one subfolder per person.
+- **All photos:** every photo once in a single grid (`/all`, linked in the header), with the same tiles, viewer and zip.
 - **Search:** find any family or person by name or nickname from the header. Press `/` to focus it.
 - **AI fix:** one-click Restore old photo, Fix faces, Colorize and Upscale 2× via Replicate. Steps can be
   chained (restore, then colorize), and any result can be downloaded or opened in the editor.
