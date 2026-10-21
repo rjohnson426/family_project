@@ -10,7 +10,25 @@ import type { Tree } from "./tree";
 // Saves are compare-and-swap on `rev`, so two people saving at the same instant can't overwrite
 // each other: the second one is told to retry against the newer tree.
 
-export const dbUrl = () => process.env.DATABASE_URL || process.env.POSTGRES_URL || "";
+const isPostgresUrl = (v?: string) => /^postgres(ql)?:\/\//.test(v ?? "");
+
+/** Name of the env var holding the connection string. The Vercel integration normally uses
+ *  DATABASE_URL, but a custom prefix (STORAGE_DATABASE_URL…) is possible, so look for any pooled one. */
+export function dbVarName(): string | null {
+  for (const n of ["DATABASE_URL", "POSTGRES_URL"]) if (isPostgresUrl(process.env[n])) return n;
+  const other = Object.keys(process.env).filter(
+    (n) => isPostgresUrl(process.env[n]) && !/UNPOOLED|NON_POOLING|PRISMA|NO_SSL/i.test(n),
+  );
+  return other.sort((a, b) => Number(/DATABASE_URL$/.test(b)) - Number(/DATABASE_URL$/.test(a)))[0] ?? null;
+}
+
+export const dbUrl = () => {
+  const n = dbVarName();
+  return n ? process.env[n]! : "";
+};
+
+/** Names (never values) of env vars that look database-related, to help when the connection is missing. */
+export const dbEnvHint = () => Object.keys(process.env).filter((n) => /POSTGRES|DATABASE|NEON|PG(HOST|USER)/i.test(n)).sort();
 
 type Row = Record<string, unknown>;
 /** Runs one SQL statement with $1, $2… parameters. Tests swap in an in-memory Postgres. */

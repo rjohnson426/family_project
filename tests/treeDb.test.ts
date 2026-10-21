@@ -86,3 +86,18 @@ test("through the store: first use seeds the database, and simultaneous edits al
   delete process.env.DATABASE_URL;
   delete process.env.TREE_STORE;
 });
+
+test("finds the connection string even under a custom prefix, and ignores unpooled ones", async () => {
+  const { dbUrl, dbVarName } = await import("@/lib/treeDb");
+  const saved = { ...process.env };
+  for (const k of Object.keys(process.env)) if (/POSTGRES|DATABASE/i.test(k)) delete process.env[k];
+  assert.equal(dbVarName(), null);
+  process.env.STORAGE_DATABASE_URL_UNPOOLED = "postgres://unpooled";
+  assert.equal(dbVarName(), null);
+  process.env.STORAGE_DATABASE_URL = "postgres://pooled";
+  assert.equal(dbVarName(), "STORAGE_DATABASE_URL");
+  process.env.DATABASE_URL = "postgresql://plain";
+  assert.equal(dbUrl(), "postgresql://plain");
+  for (const k of ["STORAGE_DATABASE_URL_UNPOOLED", "STORAGE_DATABASE_URL", "DATABASE_URL"]) delete process.env[k];
+  Object.assign(process.env, saved);
+});
