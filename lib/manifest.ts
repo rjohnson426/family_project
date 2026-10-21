@@ -2,9 +2,11 @@
 
 export type Folder = {
   name: string;
-  path: string; // "Hasan" or "Hasan/Shazia Hasan"
-  photoIds: string[];
+  path: string; // "Hasan", "Hasan/Shazia Hasan", "Hasan/Hasan Family Friends/Hamilton/John Hamilton"
+  photoIds: string[]; // the folder's own photos plus every photo below it, each once
   children: Folder[];
+  own?: string[]; // photos placed directly in it, when it also has subfolders
+  section?: "bottom"; // top-level folders shown after the families (Famous Figures, Places and Locations)
 };
 
 export type Photo = { filename: string; w: number; h: number; hash: string };
@@ -28,6 +30,30 @@ export const ALL_PATH = "*";
 export function allPhotos(manifest: Manifest): Folder {
   const photoIds = Object.keys(manifest.photos).sort((a, b) => Number(a) - Number(b));
   return { name: "All photos", path: ALL_PATH, photoIds, children: [] };
+}
+
+/** Largest album first, then by name. */
+export function byCount(folders: Folder[]): Folder[] {
+  return [...folders].sort(
+    (a, b) => b.photoIds.length - a.photoIds.length || a.name.localeCompare(b.name),
+  );
+}
+
+/** The home page: families first, then the bottom section, each largest first. */
+export function homeSections(manifest: Manifest): { families: Folder[]; bottom: Folder[] } {
+  const sorted = byCount(manifest.folders);
+  return {
+    families: sorted.filter((f) => f.section !== "bottom"),
+    bottom: sorted.filter((f) => f.section === "bottom"),
+  };
+}
+
+/**
+ * "people" for a family whose subfolders are all people; "albums" when the folder has photos of
+ * its own (a person with sub-albums) or some subfolders hold further folders.
+ */
+export function childLabel(folder: Folder): "people" | "albums" {
+  return folder.own?.length || folder.children.some((c) => c.children.length) ? "albums" : "people";
 }
 
 /** Finds a folder by its path segments (already URL-decoded). */
@@ -66,17 +92,19 @@ function splitExt(name: string): [string, string] {
 export type ZipEntry = { id: string; name: string };
 
 /**
- * The files a folder's zip holds. A family zip has one subfolder per person (a photo of two
- * people appears in both); other folders are flat. Clashing names get " (2)", " (3)"…; the
- * served files are always JPEGs, so every name ends in .jpg.
+ * The files a folder's zip holds, mirroring its subfolders at any depth (a photo of two people
+ * appears in both); photos placed directly in the folder sit at the top. Clashing names get
+ * " (2)", " (3)"…; the served files are always JPEGs, so every name ends in .jpg.
  */
 export function zipEntries(manifest: Manifest, folder: Folder): ZipEntry[] {
-  const raw: ZipEntry[] = folder.children.length
-    ? folder.children.flatMap((child) =>
-        child.photoIds.map((id) => ({ id, name: `${child.name}/${manifest.photos[id]?.filename ?? id}` })),
-      )
-    : folder.photoIds.map((id) => ({ id, name: manifest.photos[id]?.filename ?? id }));
-  return dedupeNames(raw);
+  const walk = (f: Folder, prefix: string): ZipEntry[] => {
+    const own = f.children.length ? (f.own ?? []) : f.photoIds;
+    return [
+      ...own.map((id) => ({ id, name: prefix + (manifest.photos[id]?.filename ?? id) })),
+      ...f.children.flatMap((child) => walk(child, `${prefix}${child.name}/`)),
+    ];
+  };
+  return dedupeNames(walk(folder, ""));
 }
 
 export function dedupeNames(entries: ZipEntry[]): ZipEntry[] {
@@ -97,12 +125,14 @@ export function zipName(folder: Folder): string {
 
 export type SearchItem = { name: string; path: string; count: number; family?: string };
 
-/** Every family and person, for the search box. People carry their family's name. */
+/** Every folder at any depth, for the search box. Subfolders carry their parent's name. */
 export function searchIndex(manifest: Manifest): SearchItem[] {
-  return manifest.folders.flatMap((f) => [
-    { name: f.name, path: f.path, count: f.photoIds.length },
-    ...f.children.map((c) => ({ name: c.name, path: c.path, count: c.photoIds.length, family: f.name })),
-  ]);
+  const walk = (folders: Folder[], parent?: string): SearchItem[] =>
+    folders.flatMap((f) => [
+      { name: f.name, path: f.path, count: f.photoIds.length, ...(parent && { family: parent }) },
+      ...walk(f.children, f.name),
+    ]);
+  return walk(manifest.folders);
 }
 
 const fold = (s: string) =>

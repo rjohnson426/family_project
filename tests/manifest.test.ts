@@ -83,3 +83,78 @@ test("All photos lists every photo once and works as a viewer source", async () 
   assert.equal(folderHref(ALL_PATH), "/all");
   assert.equal(zipEntries(manifest, allPhotos(manifest)).length, 3);
 });
+
+const nested: Manifest = {
+  generatedAt: "2026-10-21T00:00:00+00:00",
+  photos: {
+    "1": { filename: "a.jpg", w: 1, h: 1, hash: "1" },
+    "2": { filename: "b.jpg", w: 1, h: 1, hash: "2" },
+    "3": { filename: "c.jpg", w: 1, h: 1, hash: "3" },
+    "4": { filename: "d.jpg", w: 1, h: 1, hash: "4" },
+  },
+  folders: [
+    { name: "Places and Locations", path: "Places and Locations", photoIds: ["4", "3", "2"], children: [], section: "bottom" },
+    { name: "Famous Figures", path: "Famous Figures", photoIds: ["4"], children: [], section: "bottom" },
+    { name: "Azhar", path: "Azhar", photoIds: ["1"], children: [] },
+    {
+      name: "Hasan",
+      path: "Hasan",
+      photoIds: ["1", "2", "3"],
+      children: [
+        {
+          name: "Shazia Hasan",
+          path: "Hasan/Shazia Hasan",
+          photoIds: ["1", "2"],
+          own: ["1"],
+          children: [{ name: "First Haircut", path: "Hasan/Shazia Hasan/First Haircut", photoIds: ["2"], children: [] }],
+        },
+        {
+          name: "Friends",
+          path: "Hasan/Friends",
+          photoIds: ["3"],
+          children: [
+            {
+              name: "Hamilton",
+              path: "Hasan/Friends/Hamilton",
+              photoIds: ["3"],
+              children: [{ name: "John Hamilton", path: "Hasan/Friends/Hamilton/John Hamilton", photoIds: ["3"], children: [] }],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+test("home puts families largest first, then the bottom section largest first", async () => {
+  const { homeSections } = await import("@/lib/manifest");
+  const { families, bottom } = homeSections(nested);
+  assert.deepEqual(families.map((f) => f.name), ["Hasan", "Azhar"]);
+  assert.deepEqual(bottom.map((f) => f.name), ["Places and Locations", "Famous Figures"]);
+});
+
+test("byCount sorts by photo count, then name", async () => {
+  const { byCount } = await import("@/lib/manifest");
+  const kids = findFolder(nested, ["Hasan"])!.children;
+  assert.deepEqual(byCount(kids).map((f) => f.name), ["Shazia Hasan", "Friends"]);
+});
+
+test("a nested zip mirrors every level, with a folder's own photos at its top", () => {
+  const names = zipEntries(nested, findFolder(nested, ["Hasan"])!).map((e) => e.name);
+  assert.deepEqual(names, [
+    "Shazia Hasan/a.jpg",
+    "Shazia Hasan/First Haircut/b.jpg",
+    "Friends/Hamilton/John Hamilton/c.jpg",
+  ]);
+});
+
+test("findFolder, search and labels work at any depth", async () => {
+  const { searchIndex, searchFolders, childLabel } = await import("@/lib/manifest");
+  assert.equal(findFolder(nested, ["Hasan", "Friends", "Hamilton", "John Hamilton"])?.photoIds[0], "3");
+  const hit = searchFolders(searchIndex(nested), "john")[0];
+  assert.equal(hit.path, "Hasan/Friends/Hamilton/John Hamilton");
+  assert.equal(hit.family, "Hamilton");
+  assert.equal(childLabel(findFolder(nested, ["Hasan"])!), "albums");
+  assert.equal(childLabel(findFolder(nested, ["Hasan", "Friends", "Hamilton"])!), "people");
+  assert.equal(childLabel(findFolder(nested, ["Hasan", "Shazia Hasan"])!), "albums");
+});

@@ -4,12 +4,15 @@ Password-protected site for browsing and downloading the named family photos fro
 [`family_facial_recognition`](../family_facial_recognition). It's served at
 <https://family.southport-holdings.com>.
 
-- **Browse:** families (by last name), then each person.
+- **Browse:** the folders exactly as arranged in `~/Desktop/Organized Family Photos`, at any depth
+  (families, people, friends' families, sub-albums). Every level is sorted by photo count, largest first.
+  Famous Figures and Places and Locations sit in their own section at the bottom of the home page,
+  followed by All photos.
 - **Tiles:** Medium or Large tile view.
 - **Full size:** click a photo; ← / → step through the folder and Esc goes back.
-- **Download:** one photo, or a whole folder as a zip. A family zip has one subfolder per person.
+- **Download:** one photo, or a whole folder as a zip that mirrors its subfolders.
 - **All photos:** every photo once in a single grid (`/all`, linked in the header), with the same tiles, viewer and zip.
-- **Search:** find any family or person by name or nickname from the header. Press `/` to focus it.
+- **Search:** find any folder at any depth by name or nickname from the header. Press `/` to focus it.
 - **AI fix:** one-click Restore old photo, Fix faces, Colorize and Upscale 2× via Replicate. Steps can be
   chained (restore, then colorize), and any result can be downloaded or opened in the editor.
   The whole site shares a cap of 50 AI edits a day (Central time), and failed edits don't count.
@@ -27,7 +30,7 @@ family_facial_recognition                    family_photos (this repo)
                                                                    Next.js site on Vercel
 ```
 
-- **`export-web`** builds the folder tree from the same rules as `organize`. It writes 480px and
+- **`export-web`** reads the folder tree from `~/Desktop/Organized Family Photos` as it is on disk. It writes 480px and
   1,400px previews plus the 3,000px organize copy for each photo, stored once each.
 - **`npm run sync`** uploads only new or changed photos, then the manifest, then deletes photos that
   are no longer in the export. `npm run sync -- --dry-run` shows what would change.

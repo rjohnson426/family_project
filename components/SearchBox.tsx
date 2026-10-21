@@ -108,7 +108,7 @@ export default function SearchBox() {
             >
               <span className="font-medium text-stone-900">{item.name}</span>
               <span className="block text-xs text-stone-500">
-                {item.family ? `${item.family} family · ` : ""}
+                {item.family ? `in ${item.family} · ` : ""}
                 {item.count.toLocaleString()} {item.count === 1 ? "photo" : "photos"}
               </span>
             </li>

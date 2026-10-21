@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { folderHref, imgSrc, type Folder } from "@/lib/manifest";
+import { childLabel, folderHref, imgSrc, type Folder } from "@/lib/manifest";
 
 export default function FolderCards({ folders }: { folders: Folder[] }) {
   return (
@@ -20,7 +20,7 @@ export default function FolderCards({ folders }: { folders: Folder[] }) {
             </div>
             <p className="mt-2 truncate font-medium text-stone-900 group-hover:text-amber-800">{f.name}</p>
             <p className="text-sm text-stone-500">
-              {f.children.length > 0 && `${f.children.length} ${f.children.length === 1 ? "person" : "people"} · `}
+              {f.children.length > 0 && `${f.children.length} ${countLabel(f)} · `}
               {f.photoIds.length.toLocaleString()} {f.photoIds.length === 1 ? "photo" : "photos"}
             </p>
           </Link>
@@ -28,4 +28,9 @@ export default function FolderCards({ folders }: { folders: Folder[] }) {
       ))}
     </ul>
   );
+}
+
+function countLabel(f: Folder): string {
+  const one = f.children.length === 1;
+  return childLabel(f) === "people" ? (one ? "person" : "people") : one ? "album" : "albums";
 }
