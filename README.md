@@ -40,6 +40,16 @@ family_facial_recognition                    family_photos (this repo)
   (`client-zip`). In Chrome or Edge they stream straight to disk; in other browsers they're
   assembled in memory, so very large family zips work best in Chrome.
 
+## Family tree
+
+`/tree` is a shared family tree. Anyone with the site password can add and change people: open someone, then **+ Parent**, **+ Partner** (with marriage date), **+ Child** or **+ Brother or sister**, or **Edit details** for names, birth and death. Click any card to move the tree to that person; the URL (`/tree/<id>`) is shareable. People can be linked to a name already made in `../family_facial_recognition`, which shows their face and a "See their photos" button. "Suggested photo links" proposes matches.
+
+- Stored as one JSON file, `tree/tree.json` in the private Blob store (plus a daily copy in `tree/backups/`). Locally it's `.data/tree.json` (gitignored), even with the production Blob token in `.env.local`, so testing never touches the real tree.
+- The first time anyone opens it, the tree is loaded from `seed/tree-seed.csv` (copied into `lib/treeSeed.ts`). To start over locally, delete `.data/`.
+- There are no accounts: each editor types their name once ("Editing as", kept in their browser) and every change is logged with it. The last change can be undone from "Recent changes".
+- Photo names come from `python -m src.cli export-people` in family_facial_recognition (a `people.json` plus one face crop per named person), then `npm run sync` here uploads them. Faces are served only through `/api/tree/face/<id>`, behind the password cookie.
+- Logic is in `lib/tree.ts` (edits), `lib/layout.ts` (positions), `lib/treeImport.ts` (CSV import), `lib/treeStore.ts` (storage), with tests in `tests/tree.test.ts`.
+
 ## AI fix
 
 `lib/ai.ts` lists the tools, each pinned to a Replicate model version:

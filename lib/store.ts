@@ -7,8 +7,8 @@ import type { Manifest, Size } from "./manifest";
 
 // Production reads the private Vercel Blob store. Without a token (local dev), it reads the
 // export folder next door, so the site works before anything is uploaded.
-const LOCAL_EXPORT = path.resolve(process.cwd(), "../family_facial_recognition/data/web_export");
-const blobEnabled = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+export const LOCAL_EXPORT = path.resolve(process.cwd(), "../family_facial_recognition/data/web_export");
+export const blobEnabled = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 
 const MANIFEST_TTL_MS = 5 * 60 * 1000;
 let cached: { manifest: Manifest; at: number } | null = null;

@@ -5,8 +5,9 @@
 //
 // A photo's three files are re-uploaded only when its hash differs from the manifest already in
 // Blob (or a file is missing). The manifest goes up last, so the site never points at photos
-// that aren't uploaded yet. Needs BLOB_READ_WRITE_TOKEN in .env.local.
-import { readFile } from "node:fs/promises";
+// that aren't uploaded yet. The named people for the family tree (`export-people`: people/people.json and
+// one face crop per person) go up too when that folder exists. Needs BLOB_READ_WRITE_TOKEN in .env.local.
+import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { del, get, list, put } from "@vercel/blob";
 
@@ -80,6 +81,31 @@ await pool(toUpload, async (id) => {
   }
   if (++done % 100 === 0 || done === toUpload.length) console.log(`uploaded ${done}/${toUpload.length}`);
 });
+
+// Family tree people: tiny, so always re-upload them, and drop crops of people no longer exported.
+const peopleDir = path.join(EXPORT_DIR, "people");
+const peopleFiles = await readdir(peopleDir).catch(() => []);
+if (peopleFiles.includes("people.json")) {
+  const wanted = new Set(peopleFiles.filter((f) => f.endsWith(".jpg")).map((f) => `people/${f}`));
+  const have = new Set();
+  let cursor;
+  do {
+    const page = await list({ prefix: "people/", cursor, limit: 1000 });
+    page.blobs.forEach((b) => have.add(b.pathname));
+    cursor = page.hasMore ? page.cursor : undefined;
+  } while (cursor);
+  await pool([...wanted], async (key) => {
+    await put(key, await readFile(path.join(EXPORT_DIR, key)), {
+      access: "private", addRandomSuffix: false, allowOverwrite: true, contentType: "image/jpeg",
+    });
+  });
+  await put("people/people.json", await readFile(path.join(peopleDir, "people.json"), "utf8"), {
+    access: "private", addRandomSuffix: false, allowOverwrite: true, contentType: "application/json", cacheControlMaxAge: 60,
+  });
+  const stale = [...have].filter((k) => k.endsWith(".jpg") && !wanted.has(k));
+  if (stale.length) await del(stale);
+  console.log(`people uploaded: ${wanted.size} face crops, ${stale.length} stale removed`);
+}
 
 await put("manifest.json", manifestText, {
   access: "private",

@@ -30,6 +30,9 @@ export default function Header({ path, children }: { path?: string; children?: R
         <Link href="/all" className="text-sm font-medium text-stone-700 hover:text-amber-800">
           All photos
         </Link>
+        <Link href="/tree" className="text-sm font-medium text-stone-700 hover:text-amber-800">
+          Family tree
+        </Link>
         <SearchBox />
         {children && <div className="flex flex-wrap items-center gap-2">{children}</div>}
       </div>
