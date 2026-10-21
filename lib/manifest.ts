@@ -39,6 +39,11 @@ export function byCount(folders: Folder[]): Folder[] {
   );
 }
 
+/** A–Z by name, ignoring case, accents, quotes and brackets (so `"Ashu" Ahmed` sorts under A). */
+export function byName(folders: Folder[]): Folder[] {
+  return [...folders].sort((a, b) => fold(a.name).localeCompare(fold(b.name)));
+}
+
 /** The home page: families first, then the bottom section, each largest first. */
 export function homeSections(manifest: Manifest): { families: Folder[]; bottom: Folder[] } {
   const sorted = byCount(manifest.folders);

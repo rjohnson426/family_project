@@ -1,4 +1,5 @@
 import FolderCards from "@/components/FolderCards";
+import { FolderSortToggle } from "@/components/FolderSort";
 import Header from "@/components/Header";
 import { connection } from "next/server";
 import { allPhotos, homeSections } from "@/lib/manifest";
@@ -13,10 +14,15 @@ export default async function Home() {
     <>
       <Header />
       <main className="mx-auto max-w-7xl px-4 py-6">
-        <h1 className="font-serif text-3xl text-stone-900">Families</h1>
-        <p className="mt-1 mb-6 text-stone-600">
-          {total.toLocaleString()} photos, grouped by last name. Open a family to see each person.
-        </p>
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h1 className="font-serif text-3xl text-stone-900">Families</h1>
+            <p className="mt-1 text-stone-600">
+              {total.toLocaleString()} photos, grouped by last name. Open a family to see each person.
+            </p>
+          </div>
+          <FolderSortToggle />
+        </div>
         <FolderCards folders={families} />
         {bottom.length > 0 && (
           <section className="mt-12 border-t border-stone-200 pt-8">

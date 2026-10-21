@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import FolderCards from "@/components/FolderCards";
+import { FolderSortToggle } from "@/components/FolderSort";
 import Header from "@/components/Header";
 import PhotoGrid, { TileSizeToggle } from "@/components/PhotoGrid";
 import ZipButton from "@/components/ZipButton";
-import { byCount, childLabel, findFolder, zipEntries, zipName } from "@/lib/manifest";
+import { childLabel, findFolder, zipEntries, zipName } from "@/lib/manifest";
 import { getManifest } from "@/lib/store";
 
 function decode(segment: string): string {
@@ -30,10 +31,13 @@ export default async function FolderPage({ params }: PageProps<"/f/[...path]">) 
         <h1 className="font-serif text-3xl text-stone-900">{folder.name}</h1>
         {folder.children.length > 0 && (
           <section className="mt-6">
-            <h2 className="mb-3 text-lg font-medium text-stone-800">
-              {childLabel(folder) === "people" ? "People" : "Albums"}
-            </h2>
-            <FolderCards folders={byCount(folder.children)} />
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-lg font-medium text-stone-800">
+                {childLabel(folder) === "people" ? "People" : "Albums"}
+              </h2>
+              <FolderSortToggle />
+            </div>
+            <FolderCards folders={folder.children} />
           </section>
         )}
         <section className="mt-8">

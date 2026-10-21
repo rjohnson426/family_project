@@ -158,3 +158,12 @@ test("findFolder, search and labels work at any depth", async () => {
   assert.equal(childLabel(findFolder(nested, ["Hasan", "Friends", "Hamilton"])!), "people");
   assert.equal(childLabel(findFolder(nested, ["Hasan", "Shazia Hasan"])!), "albums");
 });
+
+test("byName sorts A–Z ignoring case and quotes", async () => {
+  const { byName } = await import("@/lib/manifest");
+  const f = (name: string) => ({ name, path: name, photoIds: [], children: [] });
+  assert.deepEqual(
+    byName([f("zaidi"), f('"Ashu" Ahmed'), f("Abid Hasan"), f("Bokhari")]).map((x) => x.name),
+    ["Abid Hasan", '"Ashu" Ahmed', "Bokhari", "zaidi"],
+  );
+});

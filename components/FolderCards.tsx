@@ -1,10 +1,15 @@
+"use client";
+
 import Link from "next/link";
-import { childLabel, folderHref, imgSrc, type Folder } from "@/lib/manifest";
+import { byCount, byName, childLabel, folderHref, imgSrc, type Folder } from "@/lib/manifest";
+import { useFolderSort } from "./FolderSort";
 
 export default function FolderCards({ folders }: { folders: Folder[] }) {
+  const sort = useFolderSort();
+  const sorted = sort === "name" ? byName(folders) : byCount(folders);
   return (
     <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-      {folders.map((f) => (
+      {sorted.map((f) => (
         <li key={f.path}>
           <Link href={folderHref(f.path)} className="group block">
             <div className="aspect-[4/3] overflow-hidden rounded-xl bg-stone-200">

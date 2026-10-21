@@ -5,7 +5,8 @@ Password-protected site for browsing and downloading the named family photos fro
 <https://family.southport-holdings.com>.
 
 - **Browse:** the folders exactly as arranged in `~/Desktop/Organized Family Photos`, at any depth
-  (families, people, friends' families, sub-albums). Every level is sorted by photo count, largest first.
+  (families, people, friends' families, sub-albums). Folders are sorted by photo count, largest first; a
+  Count / A–Z toggle above each set of folders switches to alphabetical (remembered in the browser).
   Famous Figures and Places and Locations sit in their own section at the bottom of the home page,
   followed by All photos.
 - **Tiles:** Medium or Large tile view.
