@@ -11,7 +11,7 @@ async function authorized() {
 /** The whole tree (without undo snapshots). */
 export async function GET() {
   if (!(await authorized())) return new Response("Unauthorized", { status: 401 });
-  return Response.json({ tree: publicTree(await getTree()), store: storeName(), dbEnvVars: dbEnvHint() }, { headers: { "Cache-Control": "private, no-store" } });
+  return Response.json({ tree: publicTree(await getTree()), store: storeName(), dbEnvVars: dbEnvHint(), version: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? null }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
 /** One edit: { op, who }. Returns the updated tree, or { error } with a message to show. */
