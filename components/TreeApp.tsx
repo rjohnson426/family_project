@@ -95,7 +95,7 @@ export default function TreeApp({
   const send = useCallback(
     async (op: Op): Promise<boolean> => {
       if (!who.trim()) {
-        setError("Type your name in “Editing as” first, so the family can see who made each change.");
+        setError("Type your name first (the box in the panel), so the family can see who made each change.");
         return false;
       }
       setBusy(true);
@@ -296,6 +296,8 @@ export default function TreeApp({
         named={named}
         busy={busy}
         error={error}
+        who={who}
+        onWho={setWho}
         onGo={go}
         onSend={send}
       />

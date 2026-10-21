@@ -34,11 +34,13 @@ type Props = {
   named: NamedPerson[];
   busy: boolean;
   error: string;
+  who: string;
+  onWho: (name: string) => void;
   onGo: (id: string) => void;
   onSend: (op: Op) => Promise<boolean>;
 };
 
-export default function PersonPanel({ tree, person, named, busy, error, onGo, onSend }: Props) {
+export default function PersonPanel({ tree, person, named, busy, error, who, onWho, onGo, onSend }: Props) {
   const [mode, setMode] = useState<Mode>({ type: "view" });
   const done = () => setMode({ type: "view" });
 
@@ -86,6 +88,20 @@ export default function PersonPanel({ tree, person, named, busy, error, onGo, on
         </div>
       </div>
       {person.notes && <p className="whitespace-pre-line text-sm text-stone-700">{person.notes}</p>}
+
+      <div className={`rounded-lg px-3 py-2 text-sm ${who.trim() ? "bg-stone-50" : "bg-amber-50 ring-1 ring-amber-300"}`}>
+        <label className="block">
+          <span className="mb-1 block font-medium text-stone-800">{who.trim() ? "Editing as" : "Your name (needed to make changes)"}</span>
+          <input
+            value={who}
+            onChange={(e) => onWho(e.target.value)}
+            placeholder="e.g. Rob"
+            maxLength={60}
+            className="w-full rounded-lg border border-stone-300 bg-white px-2 py-1.5"
+          />
+        </label>
+        {!who.trim() && <p className="mt-1 text-xs text-stone-600">Type it once; it&apos;s remembered on this device and shown next to each change you make.</p>}
+      </div>
 
       {error && (
         <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
