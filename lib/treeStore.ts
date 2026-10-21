@@ -4,20 +4,26 @@ import { get, put } from "@vercel/blob";
 import { randomBytes } from "node:crypto";
 import { applyOp, emptyTree, type Op, type Tree } from "./tree";
 import { treeFromCsv } from "./treeImport";
+import { dbInsertFirst, dbRead, dbSave, dbUrl } from "./treeDb";
 import { SEED_CSV, SEED_ROOT } from "./treeSeed";
 
-// The tree is one small JSON file. In production it lives in the private Blob store; locally it
-// is .data/tree.json, even when .env.local holds the production Blob token, so testing never
-// touches the real tree. Set TREE_STORE=blob to override that (the import script does).
+// Where the tree lives, in order of preference:
+//   1. Postgres (lib/treeDb.ts) when DATABASE_URL is set, in production. This is the real home.
+//      The first time it's used it copies the tree from the old Blob file, so nothing is lost.
+//   2. The private Blob store (tree/tree.json), the original home, used until a database is attached.
+//   3. .data/tree.json locally, even when .env.local holds the production tokens, so testing never
+//      touches the real tree. TREE_STORE=db or TREE_STORE=blob overrides that.
+const dbStore = () =>
+  Boolean(dbUrl()) && (process.env.NODE_ENV === "production" || process.env.TREE_STORE === "db");
 const KEY = "tree/tree.json";
 const LOCAL = path.resolve(process.cwd(), ".data/tree.json");
 const blobStore = () =>
   Boolean(process.env.BLOB_READ_WRITE_TOKEN) &&
   (process.env.NODE_ENV === "production" || process.env.TREE_STORE === "blob");
 
-export async function readTree(): Promise<Tree | null> {
+export async function readTree(forceBlob = false): Promise<Tree | null> {
   try {
-    if (blobStore()) {
+    if (forceBlob ? Boolean(process.env.BLOB_READ_WRITE_TOKEN) : blobStore()) {
       const res = await get(KEY, { access: "private", useCache: false });
       if (!res || res.statusCode !== 200) return null;
       return JSON.parse(await new Response(res.stream).text());
@@ -55,11 +61,20 @@ export async function writeTree(tree: Tree, previous?: Tree | null): Promise<voi
   });
 }
 
-/** The tree, loading the starter tree on first use. */
+const starter = () => treeFromCsv(SEED_CSV, SEED_ROOT).tree;
+
+/** The tree, loading the starter tree on first use (or, for a new database, the Blob copy). */
 export async function getTree(): Promise<Tree> {
+  if (dbStore()) {
+    const existing = await dbRead();
+    if (existing) return existing;
+    const old = await readTree(true); // the Blob file the tree lived in before the database
+    await dbInsertFirst(old ?? starter(), old ? "Copied the tree from file storage" : "Loaded the starter tree");
+    return (await dbRead()) ?? starter();
+  }
   const existing = await readTree();
   if (existing) return existing;
-  const { tree } = treeFromCsv(SEED_CSV, SEED_ROOT);
+  const tree = starter();
   await writeTree(tree);
   return tree;
 }
@@ -72,10 +87,18 @@ let queue: Promise<unknown> = Promise.resolve();
 
 export function mutate(op: Op, who: string): Promise<Tree> {
   const run = queue.then(async () => {
-    const current = await getTree();
-    const next = applyOp(current, op, { who, now: new Date().toISOString(), newId });
-    await writeTree(next, current);
-    return next;
+    // With the database, another server instance may save between our read and write; the save
+    // then fails and we redo the edit on top of the newer tree.
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const current = await getTree();
+      const next = applyOp(current, op, { who, now: new Date().toISOString(), newId });
+      if (!dbStore()) {
+        await writeTree(next, current);
+        return next;
+      }
+      if (await dbSave(next, current.rev, current)) return next;
+    }
+    throw new Error("The tree is being edited by several people at once. Please try again.");
   });
   queue = run.catch(() => undefined);
   return run;

@@ -11,6 +11,7 @@
     "test": "node --import ./tests/register.mjs --experimental-transform-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --disable-warning=ExperimentalWarning --test \"tests/**/*.test.ts\""
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.2.0",
     "@vercel/blob": "^2.8.2",
     "client-zip": "^2.5.1",
     "konva": "^9.3.18",
@@ -22,6 +23,7 @@
     "styled-components": "^5.3.11"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.11",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^20.19.43",
     "@types/react": "^19.3.0",
