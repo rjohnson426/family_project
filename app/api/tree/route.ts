@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { AUTH_COOKIE, isValidToken } from "@/lib/auth";
 import { publicTree, TreeError, type Op } from "@/lib/tree";
-import { getTree, mutate } from "@/lib/treeStore";
+import { getTree, mutate, storeName } from "@/lib/treeStore";
 
 async function authorized() {
   return isValidToken((await cookies()).get(AUTH_COOKIE)?.value);
@@ -10,7 +10,7 @@ async function authorized() {
 /** The whole tree (without undo snapshots). */
 export async function GET() {
   if (!(await authorized())) return new Response("Unauthorized", { status: 401 });
-  return Response.json({ tree: publicTree(await getTree()) }, { headers: { "Cache-Control": "private, no-store" } });
+  return Response.json({ tree: publicTree(await getTree()), store: storeName() }, { headers: { "Cache-Control": "private, no-store" } });
 }
 
 /** One edit: { op, who }. Returns the updated tree, or { error } with a message to show. */

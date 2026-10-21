@@ -61,6 +61,9 @@ export async function writeTree(tree: Tree, previous?: Tree | null): Promise<voi
   });
 }
 
+/** Which store is in use right now, for a quick check from /api/tree. */
+export const storeName = (): "postgres" | "blob" | "local" => (dbStore() ? "postgres" : blobStore() ? "blob" : "local");
+
 const starter = () => treeFromCsv(SEED_CSV, SEED_ROOT).tree;
 
 /** The tree, loading the starter tree on first use (or, for a new database, the Blob copy). */
