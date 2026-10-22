@@ -1,15 +1,32 @@
 import Link from "next/link";
 import { folderHref } from "@/lib/manifest";
+import FeedbackButton from "./FeedbackButton";
 import SearchBox from "./SearchBox";
 
-/** Breadcrumb header. `path` is the current folder path ("Hasan/Shazia Hasan"), empty at home. */
-export default function Header({ path, children }: { path?: string; children?: React.ReactNode }) {
+/**
+ * Global nav: breadcrumb on the left, search in the centre, then All photos, Family Tree (primary
+ * button) and Submit Feedback (secondary). `path` is the current folder path ("Hasan/Shazia Hasan"),
+ * empty at home. `treeId` makes Family Tree open on that person; `wide` drops the max width.
+ */
+export default function Header({
+  path,
+  treeId,
+  wide,
+  children,
+}: {
+  path?: string;
+  treeId?: string;
+  wide?: boolean;
+  children?: React.ReactNode;
+}) {
   const parts = path ? path.split("/") : [];
   return (
-    <header className="sticky top-0 z-10 border-b border-stone-200 bg-background/95 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
-        <nav aria-label="Breadcrumb" className="flex min-w-0 flex-1 flex-wrap items-center gap-1 text-sm">
-          <Link href="/" className="font-serif text-lg text-stone-900 hover:text-amber-800">
+    <header className="sticky top-0 z-20 border-b border-stone-200 bg-background/95 backdrop-blur">
+      <div
+        className={`mx-auto grid items-center gap-x-4 gap-y-2 px-4 py-3 md:grid-cols-[1fr_minmax(16rem,28rem)_1fr] ${wide ? "" : "max-w-7xl"}`}
+      >
+        <nav aria-label="Breadcrumb" className="flex min-w-0 flex-wrap items-center gap-1 text-sm">
+          <Link href="/" className="font-serif text-lg text-stone-900 hover:text-[#115740]">
             Family Photos
           </Link>
           {parts.map((part, i) => {
@@ -21,21 +38,27 @@ export default function Header({ path, children }: { path?: string; children?: R
                 {last ? (
                   <span aria-current="page" className="truncate font-medium text-stone-900">{part}</span>
                 ) : (
-                  <Link href={href} className="truncate text-stone-600 hover:text-amber-800">{part}</Link>
+                  <Link href={href} className="truncate text-stone-600 hover:text-[#115740]">{part}</Link>
                 )}
               </span>
             );
           })}
         </nav>
-        <Link href="/all" className="text-sm font-medium text-stone-700 hover:text-amber-800">
-          All photos
-        </Link>
-        <Link href="/tree" className="text-sm font-medium text-stone-700 hover:text-amber-800">
-          Family tree
-        </Link>
         <SearchBox />
-        {children && <div className="flex flex-wrap items-center gap-2">{children}</div>}
+        <div className="flex flex-wrap items-center gap-3 md:justify-end">
+          <Link href="/all" className="text-sm font-medium text-stone-700 hover:text-[#115740] hover:underline">
+            All Photos
+          </Link>
+          <Link
+            href={treeId ? `/tree/${encodeURIComponent(treeId)}` : "/tree"}
+            className="rounded-lg bg-[#115740] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#0d4432]"
+          >
+            Family Tree
+          </Link>
+          <FeedbackButton />
+        </div>
       </div>
+      {children}
     </header>
   );
 }

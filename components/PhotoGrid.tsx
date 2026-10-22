@@ -35,18 +35,21 @@ export function useTileSize(): TileSize {
 export function TileSizeToggle() {
   const size = useTileSize();
   return (
-    <div role="group" aria-label="Tile size" className="flex rounded-lg border border-stone-300 bg-white p-0.5 text-sm">
+    <div className="flex items-center gap-2 text-sm">
+     <span className="text-stone-500">Size</span>
+     <div role="group" aria-label="Tile size" className="flex rounded-lg border border-stone-300 bg-white p-0.5">
       {(["medium", "large"] as const).map((s) => (
         <button
           key={s}
           type="button"
           aria-pressed={size === s}
           onClick={() => setSize(s)}
-          className={`rounded-md px-3 py-1 capitalize ${size === s ? "bg-stone-800 text-white" : "text-stone-700 hover:bg-stone-100"}`}
+          className={`rounded-md px-3 py-1 capitalize ${size === s ? "bg-[#000066] text-white" : "text-stone-700 hover:bg-stone-100"}`}
         >
           {s}
         </button>
       ))}
+     </div>
     </div>
   );
 }

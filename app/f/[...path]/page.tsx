@@ -3,9 +3,13 @@ import FolderCards from "@/components/FolderCards";
 import { FolderSortToggle } from "@/components/FolderSort";
 import Header from "@/components/Header";
 import PhotoGrid, { TileSizeToggle } from "@/components/PhotoGrid";
+import SubNav from "@/components/SubNav";
 import ZipButton from "@/components/ZipButton";
 import { childLabel, findFolder, zipEntries, zipName } from "@/lib/manifest";
+import { getNamedPeople } from "@/lib/people";
 import { getManifest } from "@/lib/store";
+import { getTree } from "@/lib/treeStore";
+import { treeFocusFor } from "@/lib/treeFocus";
 
 function decode(segment: string): string {
   try {
@@ -21,22 +25,27 @@ export default async function FolderPage({ params }: PageProps<"/f/[...path]">) 
   const folder = findFolder(manifest, path.map(decode));
   if (!folder) notFound();
 
+  // Open the family tree on this person or family; the tree still works if it can't be read.
+  const treeId = await Promise.all([getTree(), getNamedPeople()])
+    .then(([tree, named]) => treeFocusFor(tree, named, folder))
+    .catch(() => undefined);
+
   return (
     <>
-      <Header path={folder.path}>
-        <TileSizeToggle />
-        <ZipButton entries={zipEntries(manifest, folder)} filename={zipName(folder)} />
+      <Header path={folder.path} treeId={treeId}>
+        <SubNav>
+          {folder.children.length > 0 && <FolderSortToggle />}
+          <TileSizeToggle />
+          <ZipButton entries={zipEntries(manifest, folder)} filename={zipName(folder)} />
+        </SubNav>
       </Header>
       <main className="mx-auto max-w-7xl px-4 py-6">
         <h1 className="font-serif text-3xl text-stone-900">{folder.name}</h1>
         {folder.children.length > 0 && (
           <section className="mt-6">
-            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-lg font-medium text-stone-800">
-                {childLabel(folder) === "people" ? "People" : "Albums"}
-              </h2>
-              <FolderSortToggle />
-            </div>
+            <h2 className="mb-3 text-lg font-medium text-stone-800">
+              {childLabel(folder) === "people" ? "People" : "Albums"}
+            </h2>
             <FolderCards folders={folder.children} />
           </section>
         )}

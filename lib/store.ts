@@ -3,7 +3,7 @@ import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { Readable } from "node:stream";
 import { get } from "@vercel/blob";
-import type { Manifest, Size } from "./manifest";
+import { mergeAlbums, type Manifest, type Size } from "./manifest";
 
 // Production reads the private Vercel Blob store. Without a token (local dev), it reads the
 // export folder next door, so the site works before anything is uploaded.
@@ -23,7 +23,7 @@ export async function getManifest(): Promise<Manifest> {
   } else {
     text = await readFile(path.join(LOCAL_EXPORT, "manifest.json"), "utf8");
   }
-  cached = { manifest: JSON.parse(text), at: Date.now() };
+  cached = { manifest: mergeAlbums(JSON.parse(text)), at: Date.now() };
   return cached.manifest;
 }
 

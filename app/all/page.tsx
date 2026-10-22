@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import PhotoGrid, { TileSizeToggle } from "@/components/PhotoGrid";
+import SubNav from "@/components/SubNav";
 import ZipButton from "@/components/ZipButton";
 import { allPhotos, zipEntries } from "@/lib/manifest";
 import { connection } from "next/server";
@@ -14,8 +15,10 @@ export default async function AllPhotosPage() {
   return (
     <>
       <Header path={all.name}>
-        <TileSizeToggle />
-        <ZipButton entries={zipEntries(manifest, all)} filename="All family photos.zip" />
+        <SubNav>
+          <TileSizeToggle />
+          <ZipButton entries={zipEntries(manifest, all)} filename="All family photos.zip" />
+        </SubNav>
       </Header>
       <main className="mx-auto max-w-7xl px-4 py-6">
         <h1 className="font-serif text-3xl text-stone-900">All photos</h1>

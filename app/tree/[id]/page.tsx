@@ -15,8 +15,8 @@ export default async function TreePage({ params }: PageProps<"/tree/[id]">) {
   if (!tree.people[id]) redirect("/tree");
   return (
     <>
-      <Header />
-      <main className="mx-auto max-w-7xl px-4 py-4">
+      <Header wide />
+      <main className="px-4 py-4">
         <TreeApp initialTree={publicTree(tree)} named={named} initialFocus={id} />
         <p className="mt-6 text-xs text-stone-400">
           Saved in {{ postgres: "the database (Postgres)", blob: "file storage (Blob)", local: "a local file" }[storeName()]}

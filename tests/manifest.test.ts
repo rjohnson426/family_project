@@ -167,3 +167,23 @@ test("byName sorts A–Z ignoring case and quotes", async () => {
     ["Abid Hasan", '"Ashu" Ahmed', "Bokhari", "zaidi"],
   );
 });
+
+test("mergeAlbums folds an album's photos into its parent", async () => {
+  const { mergeAlbums } = await import("@/lib/manifest");
+  const m: Manifest = {
+    ...manifest,
+    folders: [
+      {
+        name: "Hasan",
+        path: "Hasan",
+        photoIds: ["1", "2"],
+        own: ["1"],
+        children: [{ name: "Haircut", path: "Hasan/Haircut", photoIds: ["2"], children: [] }],
+      },
+    ],
+  };
+  const out = mergeAlbums(m, ["Hasan/Haircut"]).folders[0];
+  assert.equal(out.children.length, 0);
+  assert.deepEqual(out.own, ["1", "2"]);
+  assert.deepEqual(out.photoIds, ["1", "2"]);
+});

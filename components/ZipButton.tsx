@@ -64,7 +64,7 @@ export default function ZipButton({ entries, filename }: { entries: ZipEntry[]; 
         type="button"
         onClick={run}
         disabled={progress !== null || entries.length === 0}
-        className="rounded-lg bg-amber-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-900 disabled:opacity-70"
+        className="rounded-lg bg-[#115740] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#0d4432] disabled:opacity-70"
       >
         {progress
           ? `Zipping ${progress.done.toLocaleString()} / ${entries.length.toLocaleString()}…`

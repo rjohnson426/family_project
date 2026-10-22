@@ -136,7 +136,7 @@ export default function TreeApp({
   const suggestions = suggestLinks(tree, named);
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
       <section className="min-w-0">
         <div className="mb-3 flex flex-wrap items-center gap-3">
           <div className="relative min-w-48 flex-1">
@@ -203,7 +203,7 @@ export default function TreeApp({
 
         <div
           ref={scroller}
-          className="h-[70vh] min-h-96 overflow-auto rounded-xl border border-stone-200 bg-white"
+          className="h-[75vh] min-h-96 overflow-auto rounded-xl border border-stone-200 bg-white"
           aria-label={`Family tree centered on ${person.name}`}
         >
           <div className="relative" style={{ width: width * zoom, height: height * zoom }}>

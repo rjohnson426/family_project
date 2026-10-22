@@ -387,7 +387,9 @@ function LinkSection({
         </p>
         <div className="flex gap-2">
           {linked?.folderPath && (
-            <Link href={folderHref(linked.folderPath)} className={btn}>See their photos</Link>
+            <Link href={folderHref(linked.folderPath)} className="rounded-lg bg-[#115740] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#0d4432]">
+              Go to their album
+            </Link>
           )}
           <button disabled={busy} className={btn} onClick={() => onSend({ type: "link", id: person.id, linkedPersonId: null })}>
             Unlink

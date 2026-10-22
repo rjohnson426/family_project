@@ -17,6 +17,28 @@ export type Manifest = {
   photos: Record<string, Photo>;
 };
 
+/** Albums folded into their parent folder so they don't show as a separate album. */
+export const MERGED_ALBUMS = ["Hasan/Shazia Hasan/Shazia First Haircut"];
+
+/** Removes the merged albums, keeping their photos in the parent folder (own photos and total). */
+export function mergeAlbums(manifest: Manifest, paths: string[] = MERGED_ALBUMS): Manifest {
+  const walk = (folders: Folder[]): Folder[] =>
+    folders.map((f) => {
+      const merged = f.children.filter((c) => paths.includes(c.path));
+      const children = walk(f.children.filter((c) => !paths.includes(c.path)));
+      if (!merged.length) return { ...f, children };
+      const extra = merged.flatMap((c) => c.photoIds);
+      const unique = (ids: string[]) => [...new Set(ids)];
+      return {
+        ...f,
+        children,
+        photoIds: unique([...f.photoIds, ...extra]),
+        own: unique([...(f.own ?? (f.children.length ? [] : f.photoIds)), ...extra]),
+      };
+    });
+  return { ...manifest, folders: walk(manifest.folders) };
+}
+
 export const SIZES = ["thumb", "large", "full"] as const;
 export type Size = (typeof SIZES)[number];
 

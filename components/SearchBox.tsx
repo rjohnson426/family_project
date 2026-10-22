@@ -60,7 +60,7 @@ export default function SearchBox() {
 
   const showList = open && query.trim().length > 0;
   return (
-    <div className="relative w-full sm:w-72">
+    <div className="relative w-full">
       <input
         ref={input}
         type="search"
@@ -82,7 +82,7 @@ export default function SearchBox() {
           setOpen(true);
         }}
         onKeyDown={onKeyDown}
-        className="w-full rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm outline-none focus:border-amber-700 focus:ring-2 focus:ring-amber-700/20"
+        className="w-full rounded-lg border border-stone-300 bg-white px-3 py-1.5 text-sm outline-none focus:border-[#115740] focus:ring-2 focus:ring-[#115740]/20"
       />
       {showList && (
         <ul

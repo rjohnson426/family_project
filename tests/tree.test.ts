@@ -150,3 +150,15 @@ test("layout puts ancestors above, partners beside and children below", () => {
     if (a !== b && a.y === b.y) assert.ok(Math.abs(a.x - b.x) >= CARD_W, `${a.id} overlaps ${b.id}`);
   }
 });
+
+test("treeFocusFor picks the linked person, then the name, then the family surname", async () => {
+  const { treeFocusFor } = await import("@/lib/treeFocus");
+  const t = emptyTree();
+  t.people.a = { id: "a", name: "Matloob Hasan", linkedPersonId: 7 };
+  t.people.b = { id: "b", name: "Abid Hasan" };
+  const named = [{ personId: 7, name: "Matloob Hasan", folderPath: "Hasan/Matloob Hasan" }];
+  assert.equal(treeFocusFor(t, named, { path: "Hasan/Matloob Hasan", name: "Matloob Hasan" }), "a");
+  assert.equal(treeFocusFor(t, named, { path: "Hasan/Abid Hasan", name: "Abid Hasan" }), "b");
+  assert.equal(treeFocusFor(t, named, { path: "Hasan", name: "Hasan" }), "a");
+  assert.equal(treeFocusFor(t, named, { path: "Hasan/Zed", name: "Zed" }), undefined);
+});
