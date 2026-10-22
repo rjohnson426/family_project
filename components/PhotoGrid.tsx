@@ -54,7 +54,7 @@ export function TileSizeToggle() {
   );
 }
 
-export default function PhotoGrid({ ids, from, onPick }: { ids: string[]; from: string; onPick?: (id: string) => void }) {
+export default function PhotoGrid({ ids, from }: { ids: string[]; from: string }) {
   const size = useTileSize();
   const cols =
     size === "large"
@@ -64,13 +64,7 @@ export default function PhotoGrid({ ids, from, onPick }: { ids: string[]; from: 
     <ul className={`grid gap-1.5 sm:gap-2 ${cols}`}>
       {ids.map((id) => (
         <li key={id}>
-          {onPick ? (
-            <button
-              type="button"
-              aria-label="Use this photo as the album cover"
-              onClick={() => onPick(id)}
-              className="block aspect-square w-full overflow-hidden rounded-md bg-stone-200 ring-[#115740] hover:ring-4"
-            >
+          <Link href={photoHref(id, from)} className="block aspect-square overflow-hidden rounded-md bg-stone-200">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={imgSrc(id, size === "large" ? "large" : "thumb")}
@@ -79,19 +73,7 @@ export default function PhotoGrid({ ids, from, onPick }: { ids: string[]; from: 
               decoding="async"
               className="h-full w-full object-cover transition hover:opacity-90"
             />
-            </button>
-          ) : (
-            <Link href={photoHref(id, from)} className="block aspect-square overflow-hidden rounded-md bg-stone-200">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={imgSrc(id, size === "large" ? "large" : "thumb")}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              className="h-full w-full object-cover transition hover:opacity-90"
-            />
-            </Link>
-          )}
+          </Link>
         </li>
       ))}
     </ul>

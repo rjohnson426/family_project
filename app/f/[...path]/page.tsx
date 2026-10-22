@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 import FolderCards from "@/components/FolderCards";
 import { FolderSortToggle } from "@/components/FolderSort";
 import Header from "@/components/Header";
-import FolderPhotos from "@/components/FolderPhotos";
-import { TileSizeToggle } from "@/components/PhotoGrid";
+import PhotoGrid, { TileSizeToggle } from "@/components/PhotoGrid";
+import CoverPicker from "@/components/CoverPicker";
 import ZipButton from "@/components/ZipButton";
 import { childLabel, findFolder, zipEntries, zipName } from "@/lib/manifest";
 import { connection } from "next/server";
@@ -40,6 +40,7 @@ export default async function FolderPage({ params }: PageProps<"/f/[...path]">) 
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
           <h1 className="font-serif text-3xl text-stone-900">{folder.name}</h1>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <CoverPicker path={folder.path} ids={folder.photoIds} />
             <TileSizeToggle />
             <ZipButton entries={zipEntries(manifest, folder)} filename={zipName(folder)} />
           </div>
@@ -55,12 +56,13 @@ export default async function FolderPage({ params }: PageProps<"/f/[...path]">) 
             <FolderCards folders={folder.children} covers={covers} />
           </section>
         )}
-        <FolderPhotos
-          ids={folder.photoIds}
-          path={folder.path}
-          heading={folder.children.length > 0 ? "All photos" : "Photos"}
-          count={folder.photoIds.length}
-        />
+        <section className="mt-8">
+          <h2 className="mb-3 text-lg font-medium text-stone-800">
+            {folder.children.length > 0 ? "All photos" : "Photos"}{" "}
+            <span className="font-normal text-stone-500">({folder.photoIds.length.toLocaleString()})</span>
+          </h2>
+          <PhotoGrid ids={folder.photoIds} from={folder.path} />
+        </section>
       </main>
     </>
   );
