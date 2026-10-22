@@ -3,11 +3,12 @@ import { FolderSortToggle } from "@/components/FolderSort";
 import Header from "@/components/Header";
 import { connection } from "next/server";
 import { allPhotos, homeSections } from "@/lib/manifest";
+import { getCovers } from "@/lib/covers";
 import { getManifest } from "@/lib/store";
 
 export default async function Home() {
   await connection(); // read the manifest per request, not at build time
-  const manifest = await getManifest();
+  const [manifest, covers] = await Promise.all([getManifest(), getCovers()]);
   const total = Object.keys(manifest.photos).length;
   const { families, bottom } = homeSections(manifest);
   return (
@@ -23,11 +24,11 @@ export default async function Home() {
           </div>
           <FolderSortToggle />
         </div>
-        <FolderCards folders={families} />
+        <FolderCards folders={families} covers={covers} />
         {bottom.length > 0 && (
           <section className="mt-12 border-t border-stone-200 pt-8">
             <h2 className="mb-4 font-serif text-2xl text-stone-900">Famous figures and places</h2>
-            <FolderCards folders={bottom} />
+            <FolderCards folders={bottom} covers={covers} />
           </section>
         )}
         <section className="mt-12 border-t border-stone-200 pt-8">

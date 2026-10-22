@@ -37,6 +37,9 @@ export type Run = (text: string, params?: unknown[]) => Promise<Row[]>;
 let runner: Run | null = null;
 let ready: Promise<void> | null = null;
 
+/** Runs SQL on the same connection the tree uses (other small tables share it). */
+export const query: Run = (text, params) => run(text, params);
+
 export function setRunner(run: Run | null) {
   runner = run;
   ready = null;

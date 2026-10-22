@@ -13,7 +13,7 @@ import { SEED_CSV, SEED_ROOT } from "./treeSeed";
 //   2. The private Blob store (tree/tree.json), the original home, used until a database is attached.
 //   3. .data/tree.json locally, even when .env.local holds the production tokens, so testing never
 //      touches the real tree. TREE_STORE=db or TREE_STORE=blob overrides that.
-const dbStore = () =>
+export const dbStore = () =>
   Boolean(dbUrl()) && (process.env.NODE_ENV === "production" || process.env.TREE_STORE === "db");
 const KEY = "tree/tree.json";
 const LOCAL = path.resolve(process.cwd(), ".data/tree.json");

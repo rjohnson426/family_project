@@ -5,6 +5,8 @@ import Header from "@/components/Header";
 import PhotoGrid, { TileSizeToggle } from "@/components/PhotoGrid";
 import ZipButton from "@/components/ZipButton";
 import { childLabel, findFolder, zipEntries, zipName } from "@/lib/manifest";
+import { connection } from "next/server";
+import { getCovers } from "@/lib/covers";
 import { getNamedPeople } from "@/lib/people";
 import { getManifest } from "@/lib/store";
 import { getTree } from "@/lib/treeStore";
@@ -19,8 +21,9 @@ function decode(segment: string): string {
 }
 
 export default async function FolderPage({ params }: PageProps<"/f/[...path]">) {
+  await connection(); // covers and the tree change whenever the family edits them
   const { path } = await params;
-  const manifest = await getManifest();
+  const [manifest, covers] = await Promise.all([getManifest(), getCovers()]);
   const folder = findFolder(manifest, path.map(decode));
   if (!folder) notFound();
 
@@ -48,7 +51,7 @@ export default async function FolderPage({ params }: PageProps<"/f/[...path]">) 
               </h2>
               <FolderSortToggle />
             </div>
-            <FolderCards folders={folder.children} />
+            <FolderCards folders={folder.children} covers={covers} />
           </section>
         )}
         <section className="mt-8">

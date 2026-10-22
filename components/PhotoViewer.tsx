@@ -18,6 +18,7 @@ type Props = {
   photo: Photo;
   position: string;
   folderName: string;
+  folderPath: string | null;
   backHref: string;
   prevHref: string | null;
   nextHref: string | null;
@@ -26,11 +27,26 @@ type Props = {
 const button =
   "rounded-lg border border-white/20 px-3 py-1.5 text-sm font-medium text-white hover:bg-white/10";
 
-export default function PhotoViewer({ id, photo, position, folderName, backHref, prevHref, nextHref }: Props) {
+export default function PhotoViewer({ id, photo, position, folderName, folderPath, backHref, prevHref, nextHref }: Props) {
   const router = useRouter();
   // The editor opens on the original photo or on an AI result (a blob: URL).
   const [editing, setEditing] = useState<string | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
+  const [cover, setCover] = useState<"idle" | "saving" | "done" | "error">("idle");
+
+  async function makeCover() {
+    setCover("saving");
+    try {
+      const res = await fetch("/api/cover", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path: folderPath, photoId: id }),
+      });
+      setCover(res.ok ? "done" : "error");
+    } catch {
+      setCover("error");
+    }
+  }
 
   useEffect(() => {
     if (editing || aiOpen) return;
@@ -58,6 +74,11 @@ export default function PhotoViewer({ id, photo, position, folderName, backHref,
           {photo.filename}
           {position && <span className="text-stone-500"> · {position}</span>}
         </p>
+        {folderPath && (
+          <button type="button" className={button} onClick={makeCover} disabled={cover === "saving"}>
+            {cover === "done" ? "✓ Album cover set" : cover === "error" ? "Couldn't set, retry" : "Make album cover"}
+          </button>
+        )}
         <button type="button" className={button} onClick={() => setAiOpen(true)}>
           ✨ AI fix
         </button>

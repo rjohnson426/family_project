@@ -18,6 +18,7 @@ import {
 } from "@/lib/tree";
 import { folderHref } from "@/lib/manifest";
 import { Avatar } from "./TreeAvatar";
+import ThumbnailPicker from "./ThumbnailPicker";
 
 type Kind = "parent" | "child" | "sibling" | "partner";
 type Mode = { type: "view" } | { type: "add"; kind: Kind } | { type: "edit" } | { type: "delete" };
@@ -139,6 +140,7 @@ export default function PersonPanel({ tree, person, named, album, busy, error, w
           <div className="border-t border-stone-200 pt-3">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-500">Photos</h3>
             <LinkSection person={person} named={named} linked={named_} busy={busy} onSend={onSend} />
+            <ThumbnailPicker person={person} album={album} busy={busy} onSend={onSend} />
           </div>
 
           <div className="flex items-center justify-between border-t border-stone-200 pt-3 text-sm">

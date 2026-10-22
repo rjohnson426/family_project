@@ -9,6 +9,12 @@ export type Person = {
   death?: string;
   notes?: string;
   linkedPersonId?: number; // id of the named person in family_facial_recognition
+  // Chosen thumbnail: a photo id, the point in it to centre on (percent) and a zoom (1–4).
+  // Used instead of the face crop when set.
+  photoId?: string;
+  photoX?: number;
+  photoY?: number;
+  photoZ?: number;
 };
 
 export type ParentLink = { child: string; parent: string };
@@ -40,6 +46,7 @@ export type Op =
   | { type: "removeParentLink"; child: string; parent: string }
   | { type: "removePerson"; id: string }
   | { type: "link"; id: string; linkedPersonId: number | null }
+  | { type: "setPhoto"; id: string; photoId: string | null; x?: number; y?: number; zoom?: number }
   | { type: "undo"; entryId: string };
 
 export class TreeError extends Error {}
@@ -290,6 +297,27 @@ export function applyOp(tree: Tree, op: Op, ctx: Ctx): Tree {
         summary = `linked ${p.name} to their photos`;
       } else {
         throw new TreeError("That photo name isn't valid.");
+      }
+      break;
+    }
+    case "setPhoto": {
+      const p = need(t, op.id);
+      if (op.photoId === null) {
+        delete p.photoId;
+        delete p.photoX;
+        delete p.photoY;
+        delete p.photoZ;
+        summary = `went back to the default thumbnail for ${p.name}`;
+      } else if (typeof op.photoId === "string" && /^\d{1,10}$/.test(op.photoId)) {
+        const pct = (v: unknown) => Math.round(Math.min(100, Math.max(0, Number.isFinite(v) ? (v as number) : 50)));
+        const zoom = Number.isFinite(op.zoom) ? Math.min(4, Math.max(1, op.zoom as number)) : 1;
+        p.photoId = op.photoId;
+        p.photoX = pct(op.x);
+        p.photoY = pct(op.y);
+        p.photoZ = Math.round(zoom * 10) / 10;
+        summary = `changed the thumbnail for ${p.name}`;
+      } else {
+        throw new TreeError("That photo isn't valid.");
       }
       break;
     }

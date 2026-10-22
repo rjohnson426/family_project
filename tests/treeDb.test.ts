@@ -101,3 +101,15 @@ test("finds the connection string even under a custom prefix, and ignores unpool
   for (const k of ["STORAGE_DATABASE_URL_UNPOOLED", "STORAGE_DATABASE_URL", "DATABASE_URL"]) delete process.env[k];
   Object.assign(process.env, saved);
 });
+
+test("album covers are stored per folder and replaced when changed", async () => {
+  await fresh();
+  const { query } = await import("@/lib/treeDb");
+  await query("CREATE TABLE IF NOT EXISTS album_covers (path text PRIMARY KEY, photo_id text NOT NULL, updated_at timestamptz NOT NULL DEFAULT now())");
+  const set = (p: string, id: string) =>
+    query("INSERT INTO album_covers (path, photo_id) VALUES ($1, $2) ON CONFLICT (path) DO UPDATE SET photo_id = $2, updated_at = now()", [p, id]);
+  await set("Hasan", "5");
+  await set("Hasan", "9");
+  const rows = await query("SELECT path, photo_id FROM album_covers");
+  assert.deepEqual(rows, [{ path: "Hasan", photo_id: "9" }]);
+});

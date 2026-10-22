@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { AUTH_COOKIE, isValidToken } from "@/lib/auth";
 import { publicTree, TreeError, type Op } from "@/lib/tree";
 import { dbEnvHint } from "@/lib/treeDb";
+import { getManifest } from "@/lib/store";
 import { getTree, mutate, storeName } from "@/lib/treeStore";
 
 async function authorized() {
@@ -20,6 +21,9 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as { op?: Op; who?: string } | null;
   if (!body?.op || typeof body.op !== "object" || typeof body.op.type !== "string") {
     return Response.json({ error: "Nothing to do." }, { status: 400 });
+  }
+  if (body.op.type === "setPhoto" && body.op.photoId !== null && !(body.op.photoId in (await getManifest()).photos)) {
+    return Response.json({ error: "That photo isn't in the library." }, { status: 400 });
   }
   try {
     const tree = await mutate(body.op, typeof body.who === "string" ? body.who : "");

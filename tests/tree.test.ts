@@ -162,3 +162,14 @@ test("treeFocusFor picks the linked person, then the name, then the family surna
   assert.equal(treeFocusFor(t, named, { path: "Hasan", name: "Hasan" }), "a");
   assert.equal(treeFocusFor(t, named, { path: "Hasan/Zed", name: "Zed" }), undefined);
 });
+
+test("setPhoto picks a thumbnail, clamps its position and can go back to the default", () => {
+  let t = emptyTree();
+  t.people.a = { id: "a", name: "Anna" };
+  t = run(t, { type: "setPhoto", id: "a", photoId: "123", x: 140, y: -5, zoom: 9 });
+  assert.deepEqual([t.people.a.photoId, t.people.a.photoX, t.people.a.photoY, t.people.a.photoZ], ["123", 100, 0, 4]);
+  assert.throws(() => run(t, { type: "setPhoto", id: "a", photoId: "../x" }), TreeError);
+  t = run(t, { type: "setPhoto", id: "a", photoId: null });
+  assert.equal(t.people.a.photoId, undefined);
+  assert.equal(t.people.a.photoZ, undefined);
+});
