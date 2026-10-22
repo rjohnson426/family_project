@@ -25,3 +25,26 @@ export function treeFocusFor(
   }
   return undefined;
 }
+
+/**
+ * The album (folder path) for a person in the tree: their linked photo name's folder, else the
+ * folder with exactly their name or nickname (the biggest one if several). Missing means no album.
+ */
+export function albumsFor(
+  tree: Snapshot,
+  named: NamedPerson[],
+  folders: { name: string; path: string; count: number }[],
+): Record<string, string> {
+  const byName = new Map<string, { path: string; count: number }>();
+  for (const f of folders) {
+    const k = fold(f.name);
+    if ((byName.get(k)?.count ?? -1) < f.count) byName.set(k, f);
+  }
+  const out: Record<string, string> = {};
+  for (const p of Object.values(tree.people)) {
+    const linked = named.find((n) => n.personId === p.linkedPersonId)?.folderPath;
+    const path = linked ?? byName.get(fold(p.name))?.path ?? (p.nickname ? byName.get(fold(p.nickname))?.path : undefined);
+    if (path) out[p.id] = path;
+  }
+  return out;
+}

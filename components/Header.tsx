@@ -12,12 +12,10 @@ export default function Header({
   path,
   treeId,
   wide,
-  children,
 }: {
   path?: string;
   treeId?: string;
   wide?: boolean;
-  children?: React.ReactNode;
 }) {
   const parts = path ? path.split("/") : [];
   return (
@@ -49,16 +47,15 @@ export default function Header({
           <Link href="/all" className="text-sm font-medium text-stone-700 hover:text-[#115740] hover:underline">
             All Photos
           </Link>
+          <FeedbackButton />
           <Link
             href={treeId ? `/tree/${encodeURIComponent(treeId)}` : "/tree"}
             className="rounded-lg bg-[#115740] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#0d4432]"
           >
             Family Tree
           </Link>
-          <FeedbackButton />
         </div>
       </div>
-      {children}
     </header>
   );
 }

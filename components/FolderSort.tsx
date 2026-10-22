@@ -45,7 +45,7 @@ export function FolderSortToggle() {
             type="button"
             aria-pressed={sort === s}
             onClick={() => setSort(s)}
-            className={`rounded-md px-3 py-1 ${sort === s ? "bg-[#000066] text-white" : "text-stone-700 hover:bg-stone-100"}`}
+            className={`rounded-md px-3 py-1 ${sort === s ? "bg-[#2e7d62] text-white" : "text-stone-700 hover:bg-stone-100"}`}
           >
             {LABELS[s]}
           </button>

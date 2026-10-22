@@ -32,6 +32,7 @@ type Props = {
   tree: PublicTree;
   person: Person;
   named: NamedPerson[];
+  album?: string;
   busy: boolean;
   error: string;
   who: string;
@@ -40,7 +41,7 @@ type Props = {
   onSend: (op: Op) => Promise<boolean>;
 };
 
-export default function PersonPanel({ tree, person, named, busy, error, who, onWho, onGo, onSend }: Props) {
+export default function PersonPanel({ tree, person, named, album, busy, error, who, onWho, onGo, onSend }: Props) {
   const [mode, setMode] = useState<Mode>({ type: "view" });
   const done = () => setMode({ type: "view" });
 
@@ -88,6 +89,11 @@ export default function PersonPanel({ tree, person, named, busy, error, who, onW
         </div>
       </div>
       {person.notes && <p className="whitespace-pre-line text-sm text-stone-700">{person.notes}</p>}
+      {album && (
+        <Link href={folderHref(album)} className="block rounded-lg bg-[#115740] px-3 py-2 text-center text-sm font-medium text-white hover:bg-[#0d4432]">
+          Go to their album
+        </Link>
+      )}
 
       <div className={`rounded-lg px-3 py-2 text-sm ${who.trim() ? "bg-stone-50" : "bg-amber-50 ring-1 ring-amber-300"}`}>
         <label className="block">
@@ -386,11 +392,6 @@ function LinkSection({
           Linked to <strong>{linked?.name ?? "a photo name"}</strong>.
         </p>
         <div className="flex gap-2">
-          {linked?.folderPath && (
-            <Link href={folderHref(linked.folderPath)} className="rounded-lg bg-[#115740] px-3 py-1.5 text-sm font-medium text-white hover:bg-[#0d4432]">
-              Go to their album
-            </Link>
-          )}
           <button disabled={busy} className={btn} onClick={() => onSend({ type: "link", id: person.id, linkedPersonId: null })}>
             Unlink
           </button>

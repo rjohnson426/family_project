@@ -44,7 +44,7 @@ export function TileSizeToggle() {
           type="button"
           aria-pressed={size === s}
           onClick={() => setSize(s)}
-          className={`rounded-md px-3 py-1 capitalize ${size === s ? "bg-[#000066] text-white" : "text-stone-700 hover:bg-stone-100"}`}
+          className={`rounded-md px-3 py-1 capitalize ${size === s ? "bg-[#2e7d62] text-white" : "text-stone-700 hover:bg-stone-100"}`}
         >
           {s}
         </button>

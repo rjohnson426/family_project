@@ -41,13 +41,13 @@ export default function FeedbackButton() {
     }
   }
 
-  const field = "w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm outline-none focus:border-[#000066] focus:ring-2 focus:ring-[#000066]/20";
+  const field = "w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm outline-none focus:border-[#2e7d62] focus:ring-2 focus:ring-[#2e7d62]/20";
   return (
     <>
       <button
         type="button"
         onClick={open}
-        className="rounded-lg border border-[#000066] bg-white px-3 py-1.5 text-sm font-medium text-[#000066] hover:bg-[#000066]/5"
+        className="rounded-lg border border-[#2e7d62] bg-white px-3 py-1.5 text-sm font-medium text-[#2e7d62] hover:bg-[#2e7d62]/10"
       >
         Submit Feedback
       </button>
@@ -64,7 +64,7 @@ export default function FeedbackButton() {
           {state === "sent" ? (
             <>
               <p role="status" className="rounded-lg bg-[#115740]/10 px-3 py-2 text-sm text-[#115740]">
-                Thanks, your request was sent.
+                Thanks, your request was submitted.
               </p>
               <div className="flex justify-end">
                 <button type="button" onClick={() => dialog.current?.close()} className="rounded-lg bg-[#115740] px-4 py-1.5 text-sm font-medium text-white hover:bg-[#0d4432]">

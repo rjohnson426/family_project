@@ -46,10 +46,12 @@ function useWho(): [string, (v: string) => void] {
 export default function TreeApp({
   initialTree,
   named,
+  albums,
   initialFocus,
 }: {
   initialTree: PublicTree;
   named: NamedPerson[];
+  albums: Record<string, string>;
   initialFocus: string;
 }) {
   const [tree, setTree] = useState(initialTree);
@@ -294,6 +296,7 @@ export default function TreeApp({
         tree={tree}
         person={person}
         named={named}
+        album={albums[person.id]}
         busy={busy}
         error={error}
         who={who}
