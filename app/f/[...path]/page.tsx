@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import FolderCards from "@/components/FolderCards";
 import { FolderSortToggle } from "@/components/FolderSort";
 import Header from "@/components/Header";
-import PhotoGrid, { TileSizeToggle } from "@/components/PhotoGrid";
+import FolderPhotos from "@/components/FolderPhotos";
+import { TileSizeToggle } from "@/components/PhotoGrid";
 import ZipButton from "@/components/ZipButton";
 import { childLabel, findFolder, zipEntries, zipName } from "@/lib/manifest";
 import { connection } from "next/server";
@@ -54,13 +55,12 @@ export default async function FolderPage({ params }: PageProps<"/f/[...path]">) 
             <FolderCards folders={folder.children} covers={covers} />
           </section>
         )}
-        <section className="mt-8">
-          <h2 className="mb-3 text-lg font-medium text-stone-800">
-            {folder.children.length > 0 ? "All photos" : "Photos"}{" "}
-            <span className="font-normal text-stone-500">({folder.photoIds.length.toLocaleString()})</span>
-          </h2>
-          <PhotoGrid ids={folder.photoIds} from={folder.path} />
-        </section>
+        <FolderPhotos
+          ids={folder.photoIds}
+          path={folder.path}
+          heading={folder.children.length > 0 ? "All photos" : "Photos"}
+          count={folder.photoIds.length}
+        />
       </main>
     </>
   );

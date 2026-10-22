@@ -118,6 +118,7 @@ export default function PersonPanel({ tree, person, named, album, busy, error, w
 
       {mode.type === "view" && (
         <>
+          <ThumbnailPicker person={person} album={album} busy={busy} onSend={onSend} />
           <div className="flex flex-wrap gap-2">
             <button className={btn} onClick={() => setMode({ type: "add", kind: "parent" })}>+ Parent</button>
             <button className={btn} onClick={() => setMode({ type: "add", kind: "partner" })}>+ Partner</button>
@@ -140,7 +141,6 @@ export default function PersonPanel({ tree, person, named, album, busy, error, w
           <div className="border-t border-stone-200 pt-3">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-500">Photos</h3>
             <LinkSection person={person} named={named} linked={named_} busy={busy} onSend={onSend} />
-            <ThumbnailPicker person={person} album={album} busy={busy} onSend={onSend} />
           </div>
 
           <div className="flex items-center justify-between border-t border-stone-200 pt-3 text-sm">

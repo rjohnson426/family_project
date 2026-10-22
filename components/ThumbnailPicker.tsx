@@ -36,8 +36,7 @@ export default function ThumbnailPicker({
 
   if (!open) {
     return (
-      <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
-        <Avatar person={person} size={36} />
+      <div className="flex flex-wrap items-center gap-2 text-sm">
         <button className={btn} onClick={start}>Change thumbnail</button>
         {person.photoId && (
           <button className={btn} disabled={busy} onClick={() => onSend({ type: "setPhoto", id: person.id, photoId: null })}>
