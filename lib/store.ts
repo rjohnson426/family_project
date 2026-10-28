@@ -3,6 +3,7 @@ import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { Readable } from "node:stream";
 import { get } from "@vercel/blob";
+import { isUploadId } from "./uploads";
 import { mergeAlbums, type Manifest, type Size } from "./manifest";
 
 // Production reads the private Vercel Blob store. Without a token (local dev), it reads the
@@ -13,7 +14,22 @@ export const blobEnabled = () => Boolean(process.env.BLOB_READ_WRITE_TOKEN);
 const MANIFEST_TTL_MS = 5 * 60 * 1000;
 let cached: { manifest: Manifest; at: number } | null = null;
 
+/** The library: the exported manifest plus the family's uploads. A broken uploads database never hides the exported photos. */
 export async function getManifest(): Promise<Manifest> {
+  const base = await getBaseManifest();
+  try {
+    const [{ listUploads }, { getNamedPeople }, { mergeUploads }] = await Promise.all([
+      import("./uploadsStore"), import("./people"), import("./uploads"),
+    ]);
+    const uploads = await listUploads();
+    return uploads.length ? mergeUploads(base, uploads, await getNamedPeople()) : base;
+  } catch (e) {
+    console.error("Uploads unavailable", e);
+    return base;
+  }
+}
+
+async function getBaseManifest(): Promise<Manifest> {
   if (cached && Date.now() - cached.at < MANIFEST_TTL_MS) return cached.manifest;
   let text: string;
   if (blobEnabled()) {
@@ -31,6 +47,7 @@ export async function readPhoto(
   id: string,
   size: Size,
 ): Promise<{ body: ReadableStream; length?: number } | null> {
+  if (isUploadId(id)) return (await import("./uploadsStore")).readUploadImage(id, size);
   const key = `photos/${id}/${size}.jpg`;
   if (blobEnabled()) {
     const res = await get(key, { access: "private" });

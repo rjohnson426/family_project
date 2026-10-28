@@ -21,7 +21,7 @@ export default async function PhotoPage({ params, searchParams }: PageProps<"/p/
       id={id}
       photo={photo}
       position={folder ? `${index + 1} of ${ids.length}` : ""}
-      folderPath={folder && folder.path !== "*" ? folder.path : null}
+      folderPath={folder && folder.path !== "*" && !folder.path.startsWith("~u/") ? folder.path : null}
       folderName={folder?.name ?? "Home"}
       backHref={folder ? folderHref(folder.path) : "/"}
       prevHref={href(index - 1)}

@@ -15,7 +15,11 @@ export type Manifest = {
   generatedAt: string;
   folders: Folder[];
   photos: Record<string, Photo>;
+  uploaders?: Record<string, string[]>; // uploader name -> their uploaded photo ids, added when uploads are merged in
 };
+
+/** Path prefix of the "uploaded by" views; can't clash with a folder name. */
+export const UPLOADS_PREFIX = "~u";
 
 /** Albums folded into their parent folder so they don't show as a separate album. */
 export const MERGED_ALBUMS = ["Hasan/Shazia Hasan/Shazia First Haircut"];
@@ -50,7 +54,9 @@ export function isSize(s: string): s is Size {
 export const ALL_PATH = "*";
 
 export function allPhotos(manifest: Manifest): Folder {
-  const photoIds = Object.keys(manifest.photos).sort((a, b) => Number(a) - Number(b));
+  // Exported photos by number, then uploads in the order they were added.
+  const all = Object.keys(manifest.photos);
+  const photoIds = [...all.filter((id) => /^\d+$/.test(id)).sort((a, b) => Number(a) - Number(b)), ...all.filter((id) => !/^\d+$/.test(id))];
   return { name: "All photos", path: ALL_PATH, photoIds, children: [] };
 }
 
@@ -86,6 +92,7 @@ export function childLabel(folder: Folder): "people" | "albums" {
 /** Finds a folder by its path segments (already URL-decoded). */
 export function findFolder(manifest: Manifest, segments: string[]): Folder | null {
   if (segments.length === 1 && segments[0] === ALL_PATH) return allPhotos(manifest);
+  if (segments.length === 2 && segments[0] === UPLOADS_PREFIX) return uploaderFolder(manifest, segments[1]);
   let level = manifest.folders;
   let found: Folder | null = null;
   for (let i = 0; i < segments.length; i++) {
@@ -97,8 +104,15 @@ export function findFolder(manifest: Manifest, segments: string[]): Folder | nul
   return found;
 }
 
+/** Photos one person uploaded, newest last, as a folder-like view (`~u/<name>`). */
+export function uploaderFolder(manifest: Manifest, who: string): Folder | null {
+  const ids = manifest.uploaders?.[who];
+  return ids ? { name: `Uploaded by ${who}`, path: `${UPLOADS_PREFIX}/${who}`, photoIds: ids, children: [] } : null;
+}
+
 export function folderHref(path: string): string {
   if (path === ALL_PATH) return "/all";
+  if (path.startsWith(UPLOADS_PREFIX + "/")) return "/uploads/" + encodeURIComponent(path.slice(UPLOADS_PREFIX.length + 1));
   return "/f/" + path.split("/").map(encodeURIComponent).join("/");
 }
 

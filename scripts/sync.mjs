@@ -102,6 +102,12 @@ if (peopleFiles.includes("people.json")) {
   await put("people/people.json", await readFile(path.join(peopleDir, "people.json"), "utf8"), {
     access: "private", addRandomSuffix: false, allowOverwrite: true, contentType: "application/json", cacheControlMaxAge: 60,
   });
+  // Averaged face fingerprints, so uploads can suggest who is in a photo (family_photos /upload).
+  if (peopleFiles.includes("centroids.json")) {
+    await put("people/centroids.json", await readFile(path.join(peopleDir, "centroids.json"), "utf8"), {
+      access: "private", addRandomSuffix: false, allowOverwrite: true, contentType: "application/json", cacheControlMaxAge: 60,
+    });
+  }
   const stale = [...have].filter((k) => k.endsWith(".jpg") && !wanted.has(k));
   if (stale.length) await del(stale);
   console.log(`people uploaded: ${wanted.size} face crops, ${stale.length} stale removed`);

@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useWho } from "@/lib/who";
 import { CARD_H, CARD_W, edgePath, layoutTree } from "@/lib/layout";
 import {
   lifespan,
@@ -14,34 +15,6 @@ import PersonPanel from "./PersonPanel";
 import { Avatar } from "./TreeAvatar";
 
 const PAD = 40;
-const WHO_KEY = "family-tree-who";
-
-// The editor's name lives in this browser only; it just labels their changes in the history.
-const whoListeners = new Set<() => void>();
-const readWho = () => {
-  try {
-    return localStorage.getItem(WHO_KEY) ?? "";
-  } catch {
-    return "";
-  }
-};
-function useWho(): [string, (v: string) => void] {
-  const who = useSyncExternalStore(
-    (cb) => {
-      whoListeners.add(cb);
-      return () => void whoListeners.delete(cb);
-    },
-    readWho,
-    () => "",
-  );
-  const set = (v: string) => {
-    try {
-      localStorage.setItem(WHO_KEY, v);
-    } catch {}
-    whoListeners.forEach((f) => f());
-  };
-  return [who, set];
-}
 
 export default function TreeApp({
   initialTree,

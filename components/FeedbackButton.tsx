@@ -47,9 +47,9 @@ export default function FeedbackButton() {
       <button
         type="button"
         onClick={open}
-        className="rounded-lg border border-[#2e7d62] bg-white px-3 py-1.5 text-sm font-medium text-[#2e7d62] hover:bg-[#2e7d62]/10"
+        className="text-sm font-medium text-stone-700 hover:text-[#115740] hover:underline"
       >
-        Submit Feedback
+        Feedback
       </button>
       <dialog
         ref={dialog}
