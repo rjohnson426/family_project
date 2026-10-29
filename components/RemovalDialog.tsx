@@ -2,10 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
-/** Asks for a reason, then hides the photo from the site and tells Rob. Opens as soon as it mounts. */
+/** Confirms, then hides the photo from the site and tells Rob. Opens as soon as it mounts. */
 export default function RemovalDialog({ id, filename, onClose, onRemoved }: { id: string; filename: string; onClose: () => void; onRemoved: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
-  const [reason, setReason] = useState("");
   const [state, setState] = useState<"idle" | "sending">("idle");
   const [error, setError] = useState("");
 
@@ -21,7 +20,7 @@ export default function RemovalDialog({ id, filename, onClose, onRemoved }: { id
       const res = await fetch("/api/removals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ photoId: id, reason, page: location.pathname }),
+        body: JSON.stringify({ photoId: id, page: location.pathname }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
@@ -48,16 +47,6 @@ export default function RemovalDialog({ id, filename, onClose, onRemoved }: { id
         <p className="text-sm text-stone-600">
           {filename} will come off the site right away and Rob will be notified. The original is kept, and he can put it back.
         </p>
-        <label className="block text-sm font-medium text-stone-800">
-          Reason (optional)
-          <textarea
-            maxLength={500}
-            rows={3}
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm font-normal outline-none focus:border-[#2e7d62] focus:ring-2 focus:ring-[#2e7d62]/20"
-          />
-        </label>
         {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
         <div className="flex justify-end gap-2">
           <button type="button" onClick={() => dialog.current?.close()} className="rounded-lg border border-stone-300 px-4 py-1.5 text-sm text-stone-700 hover:bg-stone-100">
