@@ -43,6 +43,23 @@ export function mergeAlbums(manifest: Manifest, paths: string[] = MERGED_ALBUMS)
   return { ...manifest, folders: walk(manifest.folders) };
 }
 
+/** Drops removed photos from the library everywhere (photo list, every folder, uploader lists). The files stay in storage. */
+export function hidePhotos(manifest: Manifest, ids: Iterable<string>): Manifest {
+  const hidden = new Set(ids);
+  if (!hidden.size) return manifest;
+  const keep = (list: string[]) => list.filter((id) => !hidden.has(id));
+  const walk = (folders: Folder[]): Folder[] =>
+    folders.map((f) => ({ ...f, photoIds: keep(f.photoIds), ...(f.own && { own: keep(f.own) }), children: walk(f.children) }));
+  return {
+    ...manifest,
+    folders: walk(manifest.folders),
+    photos: Object.fromEntries(Object.entries(manifest.photos).filter(([id]) => !hidden.has(id))),
+    ...(manifest.uploaders && {
+      uploaders: Object.fromEntries(Object.entries(manifest.uploaders).map(([who, ids]) => [who, keep(ids)])),
+    }),
+  };
+}
+
 export const SIZES = ["thumb", "large", "full"] as const;
 export type Size = (typeof SIZES)[number];
 

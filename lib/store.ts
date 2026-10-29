@@ -4,7 +4,8 @@ import path from "node:path";
 import { Readable } from "node:stream";
 import { get } from "@vercel/blob";
 import { isUploadId } from "./uploads";
-import { mergeAlbums, type Manifest, type Size } from "./manifest";
+import { hiddenIds } from "./removals";
+import { hidePhotos, mergeAlbums, type Manifest, type Size } from "./manifest";
 
 // Production reads the private Vercel Blob store. Without a token (local dev), it reads the
 // export folder next door, so the site works before anything is uploaded.
@@ -16,6 +17,16 @@ let cached: { manifest: Manifest; at: number } | null = null;
 
 /** The library: the exported manifest plus the family's uploads. A broken uploads database never hides the exported photos. */
 export async function getManifest(): Promise<Manifest> {
+  const library = await getUnhiddenManifest();
+  try {
+    return hidePhotos(library, await hiddenIds());
+  } catch (e) {
+    console.error("Removal list unavailable", e);
+    return library;
+  }
+}
+
+async function getUnhiddenManifest(): Promise<Manifest> {
   const base = await getBaseManifest();
   try {
     const [{ listUploads }, { getNamedPeople }, { mergeUploads }] = await Promise.all([

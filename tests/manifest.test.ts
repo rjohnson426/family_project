@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { dedupeNames, findFolder, folderHref, zipEntries, zipName, type Manifest } from "@/lib/manifest";
+import { dedupeNames, findFolder, folderHref, hidePhotos, zipEntries, zipName, type Manifest } from "@/lib/manifest";
 
 const manifest: Manifest = {
   generatedAt: "2026-10-20T00:00:00+00:00",
@@ -186,4 +186,19 @@ test("mergeAlbums folds an album's photos into its parent", async () => {
   assert.equal(out.children.length, 0);
   assert.deepEqual(out.own, ["1", "2"]);
   assert.deepEqual(out.photoIds, ["1", "2"]);
+});
+
+test("hidePhotos removes a photo from the list, every folder and the uploaders", () => {
+  const m: Manifest = {
+    generatedAt: "",
+    photos: { "1": { filename: "a.jpg", w: 1, h: 1, hash: "" }, "2": { filename: "b.jpg", w: 1, h: 1, hash: "" } },
+    folders: [{ name: "A", path: "A", photoIds: ["1", "2"], own: ["1"], children: [{ name: "B", path: "A/B", photoIds: ["2"], children: [] }] }],
+    uploaders: { Rob: ["1", "2"] },
+  };
+  const out = hidePhotos(m, ["2"]);
+  assert.deepEqual(Object.keys(out.photos), ["1"]);
+  assert.deepEqual(out.folders[0].photoIds, ["1"]);
+  assert.deepEqual(out.folders[0].children[0].photoIds, []);
+  assert.deepEqual(out.uploaders, { Rob: ["1"] });
+  assert.equal(hidePhotos(m, []), m);
 });

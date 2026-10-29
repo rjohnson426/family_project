@@ -6,6 +6,8 @@ import { useFolderSort } from "./FolderSort";
 
 export default function FolderCards({ folders, covers = {} }: { folders: Folder[]; covers?: Record<string, string> }) {
   const sort = useFolderSort();
+  // A cover whose photo was removed falls back to the folder's first photo.
+  const coverOf = (f: Folder) => (covers[f.path] && f.photoIds.includes(covers[f.path]) ? covers[f.path] : f.photoIds[0]);
   const sorted = sort === "name" ? byName(folders) : byCount(folders);
   return (
     <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
@@ -13,10 +15,10 @@ export default function FolderCards({ folders, covers = {} }: { folders: Folder[
         <li key={f.path}>
           <Link href={folderHref(f.path)} className="group block">
             <div className="aspect-[4/3] overflow-hidden rounded-xl bg-stone-200">
-              {(covers[f.path] ?? f.photoIds[0]) && (
+              {coverOf(f) && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={imgSrc(covers[f.path] ?? f.photoIds[0], "thumb")}
+                  src={imgSrc(coverOf(f), "thumb")}
                   alt=""
                   loading="lazy"
                   className="h-full w-full object-cover transition group-hover:scale-[1.03]"

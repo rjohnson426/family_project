@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { imgSrc, type Photo } from "@/lib/manifest";
 
 // The editor is large and needs the browser canvas, so it loads only when opened.
+const RemovalDialog = dynamic(() => import("./RemovalDialog"), { ssr: false });
 const AiPanel = dynamic(() => import("./AiPanel"), { ssr: false });
 const Editor = dynamic(() => import("./Editor"), {
   ssr: false,
@@ -32,6 +33,7 @@ export default function PhotoViewer({ id, photo, position, folderName, folderPat
   // The editor opens on the original photo or on an AI result (a blob: URL).
   const [editing, setEditing] = useState<string | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
+  const [removeOpen, setRemoveOpen] = useState(false);
   const [cover, setCover] = useState<"idle" | "saving" | "done" | "error">("idle");
 
   async function makeCover() {
@@ -49,7 +51,7 @@ export default function PhotoViewer({ id, photo, position, folderName, folderPat
   }
 
   useEffect(() => {
-    if (editing || aiOpen) return;
+    if (editing || aiOpen || removeOpen) return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "ArrowLeft" && prevHref) router.push(prevHref);
       else if (e.key === "ArrowRight" && nextHref) router.push(nextHref);
@@ -57,7 +59,7 @@ export default function PhotoViewer({ id, photo, position, folderName, folderPat
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [editing, aiOpen, prevHref, nextHref, backHref, router]);
+  }, [editing, aiOpen, removeOpen, prevHref, nextHref, backHref, router]);
 
   // Warm the cache so arrowing through a folder feels instant.
   useEffect(() => {
@@ -79,6 +81,9 @@ export default function PhotoViewer({ id, photo, position, folderName, folderPat
             {cover === "done" ? "✓ Album cover set" : cover === "error" ? "Couldn't set, retry" : "Make album cover"}
           </button>
         )}
+        <button type="button" className={button} onClick={() => setRemoveOpen(true)}>
+          Request removal
+        </button>
         <button type="button" className={button} onClick={() => setAiOpen(true)}>
           ✨ AI fix
         </button>
@@ -113,6 +118,7 @@ export default function PhotoViewer({ id, photo, position, folderName, folderPat
         )}
       </div>
 
+      {removeOpen && <RemovalDialog id={id} filename={photo.filename} onClose={() => setRemoveOpen(false)} onRemoved={() => router.push(nextHref ?? prevHref ?? backHref)} />}
       {aiOpen && (
         <AiPanel
           id={id}

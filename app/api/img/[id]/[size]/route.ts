@@ -13,6 +13,7 @@ export async function GET(request: Request, ctx: RouteContext<"/api/img/[id]/[si
   }
   if (!(/^\d+$/.test(id) || isUploadId(id)) || !isSize(size)) return new Response("Not found", { status: 404 });
 
+  if (!(id in (await getManifest()).photos)) return new Response("Not found", { status: 404 });
   const photo = await readPhoto(id, size);
   if (!photo) return new Response("Not found", { status: 404 });
 
