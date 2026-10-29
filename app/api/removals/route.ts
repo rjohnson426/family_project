@@ -35,12 +35,12 @@ export async function POST(request: Request) {
     console.error("Removal hidden but nobody notified: GITHUB_FEEDBACK_TOKEN is not set.", { photoId });
   } else {
     const description =
-      `${reason || "(no reason given)"}\n\nPhoto ${photoId} (${photo.filename}) is **already hidden** from the site. ` +
+      `**${photo.filename}** (photo ${photoId})\n\nReason: ${reason || "none given"}\n\nThis photo is **already hidden** from the site. ` +
       `The original files are untouched. To restore it, delete its row from \`photo_removals\` in Neon ` +
       `(\`DELETE FROM photo_removals WHERE photo_id = '${photoId}'\`).`;
     try {
       await openFeedbackPr(token, process.env.FEEDBACK_REPO || FEEDBACK_REPO, {
-        title: `Photo removed: ${photo.filename} (${photoId})`,
+        title: `Photo removed: ${photo.filename}`,
         description,
         page,
       });
