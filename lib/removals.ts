@@ -9,13 +9,12 @@ import { dbStore } from "./treeStore";
 // Postgres (table photo_removals); locally they go to .data/removals.json.
 
 const LOCAL = path.resolve(process.cwd(), ".data/removals.json");
-export const REMOVAL_REASON_MAX = 500;
 
-export type Removal = { photoId: string; reason: string; page: string; at: string };
+export type Removal = { photoId: string; page: string; at: string };
 
 async function ensure() {
   await query(`CREATE TABLE IF NOT EXISTS photo_removals (
-    photo_id text PRIMARY KEY, reason text NOT NULL DEFAULT '', page text NOT NULL DEFAULT '',
+    photo_id text PRIMARY KEY, page text NOT NULL DEFAULT '',
     requested_at timestamptz NOT NULL DEFAULT now()
   )`);
 }
@@ -41,12 +40,12 @@ export async function hiddenIds(): Promise<string[]> {
 }
 
 /** Hides a photo. Asking twice for the same photo is harmless. */
-export async function hidePhoto(r: { photoId: string; reason: string; page: string }): Promise<void> {
+export async function hidePhoto(r: { photoId: string; page: string }): Promise<void> {
   if (dbStore()) {
     await ensure();
     await query(
-      `INSERT INTO photo_removals (photo_id, reason, page) VALUES ($1, $2, $3) ON CONFLICT (photo_id) DO NOTHING`,
-      [r.photoId, r.reason, r.page],
+      `INSERT INTO photo_removals (photo_id, page) VALUES ($1, $2) ON CONFLICT (photo_id) DO NOTHING`,
+      [r.photoId, r.page],
     );
   } else {
     const all = await readLocal();
