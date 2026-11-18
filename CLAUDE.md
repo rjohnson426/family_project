@@ -16,3 +16,15 @@ Password-protected family photo site at https://family.southport-holdings.com. I
 - **AI fix:** Replicate models in `lib/ai.ts`, with a site-wide cap of 50 a day (`lib/usage.ts`). `REPLICATE_API_TOKEN` lives in `.env.local` and the Vercel env.
   - Each test run costs real money (cents), so keep test runs to a handful.
 - **Editor:** `react-filerobot-image-editor` is pinned to an exact 5.0 beta, which is the version that supports React 19. Check the editor still opens and saves after any upgrade.
+
+## Working with Rob
+
+Carried over from the workspace-level `CLAUDE.md` and memory so cloud sessions and other computers see them too.
+
+- **Plain language.** No coined labels or jargon; say "lost focus", not a catchy name for it.
+- **Secrets** go in gitignored `.env` files. Never put a key in a tracked file or repeat one in chat.
+- **Git.** Commit when a task is finished, then push to `origin` without asking. Stage files by name; never commit `.env*`, secrets or photos. Run the project's tests first. Commit author email must be `rajohnson426@gmail.com`. `git pull --rebase` before pushing where a routine also pushes.
+- **iCloud duplicates** named `<name> 2.<ext>` (or `3`) are not real files: don't edit, import, commit or delete them.
+- **Opening sites** for Rob to look at: use Claude in Chrome, each in a new tab, and leave them open.
+- **Never send email or share files** without being asked.
+- Rob Johnson (rajohnson426@gmail.com) is a product manager building Southport; Shazia Hasan (hello.shaziahasan@gmail.com) is his spouse and business partner. Double-check her address.
