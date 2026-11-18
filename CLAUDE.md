@@ -28,3 +28,7 @@ Carried over from the workspace-level `CLAUDE.md` and memory so cloud sessions a
 - **Opening sites** for Rob to look at: use Claude in Chrome, each in a new tab, and leave them open.
 - **Never send email or share files** without being asked.
 - Rob Johnson (rajohnson426@gmail.com) is a product manager building Southport; Shazia Hasan (hello.shaziahasan@gmail.com) is his spouse and business partner. Double-check her address.
+
+## Chat history
+
+`docs/history/` holds text-only exports of earlier Claude chats about this project (see its `README.md`), so cloud sessions and other computers have the background. Treat it as context that may be stale.

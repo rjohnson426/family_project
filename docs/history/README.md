@@ -1,0 +1,20 @@
+# Chat history (family_photos)
+
+Text-only exports of earlier Claude chats from the old workspace folder (tool output left out; long messages cut at 3,000 characters). Newest first.
+
+- 2026-11-06 [Accessing Apple Photos](2026-11-06-accessing-apple-photos-ce86c6.md)
+- 2026-10-29 [Photo removal request workflow](2026-10-29-photo-removal-request-workflow-adf14b.md)
+- 2026-10-29 [Family facial recognition photo deletion](2026-10-29-family-facial-recognition-photo-deletion-79bc3e.md)
+- 2026-10-29 [Family album password change](2026-10-29-family-album-password-change-baac2e.md)
+- 2026-10-28 [Family photo sharing and tagging](2026-10-28-family-photo-sharing-and-tagging-0a2bcb.md)
+- 2026-10-22 [Family project UI feedback](2026-10-22-family-project-ui-feedback-c70e2d.md)
+- 2026-10-21 [Family tree tool](2026-10-21-family-tree-tool-d28c85.md)
+- 2026-10-21 [Family tree not live after deployment](2026-10-21-family-tree-not-live-after-deployment-5a17ac.md)
+- 2026-10-20 [Family photo organization and storage](2026-10-20-family-photo-organization-and-storage-4daf0a.md)
+- 2026-10-20 [Family photo organization and storage](2026-10-20-family-photo-organization-and-storage-1eeaf2.md)
+- 2026-10-20 [Facial recognition photo sharing portal](2026-10-20-facial-recognition-photo-sharing-portal-209052.md)
+- 2026-10-19 [IN family facial recognition local deployment](2026-10-19-in-family-facial-recognition-local-deployment-cdb361.md)
+- 2026-10-18 [Family facial recognition categorization](2026-10-18-family-facial-recognition-categorization-ba21ce.md)
+- 2026-10-14 [Family facial recognition grouping](2026-10-14-family-facial-recognition-grouping-524565.md)
+- 2026-10-13 [Hamilton photos folder creation](2026-10-13-hamilton-photos-folder-creation-8a84c3.md)
+- 2026-10-11 [Family Facial recognition local setup](2026-10-11-family-facial-recognition-local-setup-b94107.md)
